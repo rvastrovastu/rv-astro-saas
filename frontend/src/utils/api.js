@@ -6,7 +6,7 @@ import axios from "axios";
  * ===============================
  */
 const API = axios.create({
-  baseURL: "http://localhost:8787/api",
+  baseURL: "https://rv-astro-api.rvastrovastu.workers.dev/api",
   headers: {
     "Content-Type": "application/json"
   }
