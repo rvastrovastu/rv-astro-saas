@@ -11,6 +11,7 @@ export default function Booking() {
       <div style={{ display: "flex", justifyContent: "center", marginTop: "30px" }}>
 
         <iframe
+          title="RV AstroVastu Consultation Booking"
           src="https://calendly.com/rvastrovastu/consultation"
           width="100%"
           height="700px"
