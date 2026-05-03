@@ -1,6 +1,3 @@
-cd /Users/riteshvyas/rvyas-astro
-
-cat > frontend/src/pages/AIAstrology.jsx <<'EOF'
 import { useState } from "react";
 
 export default function AIAstrology() {
@@ -40,4 +37,3 @@ export default function AIAstrology() {
     </div>
   );
 }
-EOF
