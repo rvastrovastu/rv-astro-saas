@@ -1,11 +1,18 @@
 import { useState } from "react";
 
 export default function AIAstrology() {
-  const [query, setQuery] = useState("");
+  const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
 
-  const askAI = async () => {
-    setAnswer(`AI is thinking about: ${query || "your question"}...`);
+  const askAI = () => {
+    const text = question.trim();
+
+    if (!text) {
+      setAnswer("⚠️ Please enter a question.");
+      return;
+    }
+
+    setAnswer(`🔮 AI is analyzing: "${text}"...`);
   };
 
   return (
@@ -13,16 +20,20 @@ export default function AIAstrology() {
       <h2>🤖 AI Astrology Assistant</h2>
 
       <textarea
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
+        value={question}
+        onChange={(e) => setQuestion(e.target.value)}
         placeholder="Ask your astrology question..."
+        rows={4}
+        style={{ width: "100%", marginBottom: 10 }}
       />
 
       <br />
 
-      <button onClick={askAI}>Ask AI</button>
+      <button type="button" onClick={askAI}>
+        Ask AI
+      </button>
 
-      <p>{answer}</p>
+      {answer && <p>{answer}</p>}
     </div>
   );
 }
