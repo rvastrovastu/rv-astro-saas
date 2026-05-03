@@ -2,6 +2,7 @@ name = "rv-astro-api"
 main = "src/index.js"
 compatibility_date = "2026-04-30"
 compatibility_flags = ["nodejs_compat"]
+
 [vars]
-FRONTEND_URL = https://rv-astro-vastu.pages.dev
-JWT_SECRET = rvastro_super_secure_jwt_secret_2026
+FRONTEND_URL = "https://rv-astro-vastu.pages.dev"
+JWT_SECRET = "rvastro_super_secure_jwt_secret_2026"
