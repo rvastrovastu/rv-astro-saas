@@ -6,7 +6,7 @@ import axios from "axios";
  * ===============================
  */
 const API = axios.create({
-  baseURL: "https://rv-astro-api.rvastrovastu.workers.dev/api",
+  baseURL: "https://api.rvastrovastu.com/api",
   headers: {
     "Content-Type": "application/json"
   }
@@ -27,9 +27,7 @@ API.interceptors.request.use(
 
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
 /**
@@ -54,14 +52,17 @@ API.interceptors.response.use(
 
       try {
         const refreshRes = await axios.post(
-          "http://localhost:5001/api/auth/refresh",
+          "https://api.rvastrovastu.com/api/auth/refresh",
           {
             refreshToken: localStorage.getItem("refreshToken")
           }
         );
 
         localStorage.setItem("token", refreshRes.data.token);
-        localStorage.setItem("refreshToken", refreshRes.data.refreshToken);
+
+        if (refreshRes.data.refreshToken) {
+          localStorage.setItem("refreshToken", refreshRes.data.refreshToken);
+        }
 
         if (refreshRes.data.user) {
           localStorage.setItem("user", JSON.stringify(refreshRes.data.user));
