@@ -206,40 +206,135 @@ app.post("/api/match/kundali", async (c) => {
 });
 
 app.post("/api/panchang/daily", async (c) => {
-  const { date, place, lat, lon, tzone } = await c.req.json();
+  try {
+    const { date, place, lat, lon, tzone } = await c.req.json();
 
-  if (!date) {
-    return c.json({ success: false, message: "Date is required" }, 400);
-  }
-
-  return c.json({
-    success: true,
-    source: "cloudflare_fallback",
-    place: place || "Dallas",
-    date,
-    location: {
-      lat: lat || 32.7767,
-      lon: lon || -96.797,
-      tzone: tzone || -5
-    },
-    panchang: {
-      tithi: "Shukla Paksha",
-      nakshatra: "Rohini",
-      yoga: "Shubha Yoga",
-      karana: "Bava",
-      sunrise: "06:22 AM",
-      sunset: "07:58 PM",
-      moonrise: "09:12 PM",
-      moonset: "07:45 AM",
-      rahuKaal: "10:30 AM - 12:00 PM",
-      gulikaKaal: "07:30 AM - 09:00 AM",
-      yamaGandam: "03:00 PM - 04:30 PM",
-      abhijitMuhurat: "12:05 PM - 12:55 PM",
-      brahmaMuhurat: "04:35 AM - 05:20 AM",
-      amritKaal: "06:10 PM - 07:42 PM",
-      durMuhurat: "01:15 PM - 02:05 PM"
+    if (!date) {
+      return c.json({ success: false, message: "Date is required" }, 400);
     }
-  });
+
+    const selectedDate = new Date(date);
+
+    const payload = {
+      year: selectedDate.getFullYear(),
+      month: selectedDate.getMonth() + 1,
+      date: selectedDate.getDate(),
+      hours: 6,
+      minutes: 0,
+      seconds: 0,
+      latitude: Number(lat) || 32.7767,
+      longitude: Number(lon) || -96.797,
+      timezone: Number(tzone) || -5,
+      config: {
+        observation_point: "topocentric",
+        ayanamsha: "lahiri"
+      }
+    };
+
+    const fallbackData = {
+      success: true,
+      source: "fallback",
+      debug: "FREE_ASTROLOGY_API_KEY missing or real API failed",
+      place: place || "Dallas",
+      date,
+      location: {
+        lat: Number(lat) || 32.7767,
+        lon: Number(lon) || -96.797,
+        tzone: Number(tzone) || -5
+      },
+      panchang: {
+        tithi: "Shukla Paksha",
+        nakshatra: "Rohini",
+        yoga: "Shubha Yoga",
+        karana: "Bava",
+        sunrise: "06:22 AM",
+        sunset: "07:58 PM",
+        moonrise: "09:12 PM",
+        moonset: "07:45 AM",
+        rahuKaal: "10:30 AM - 12:00 PM",
+        gulikaKaal: "07:30 AM - 09:00 AM",
+        yamaGandam: "03:00 PM - 04:30 PM",
+        abhijitMuhurat: "12:05 PM - 12:55 PM",
+        brahmaMuhurat: "04:35 AM - 05:20 AM",
+        amritKaal: "06:10 PM - 07:42 PM",
+        durMuhurat: "01:15 PM - 02:05 PM"
+      }
+    };
+
+    if (!c.env.FREE_ASTROLOGY_API_KEY) {
+      return c.json({
+        ...fallbackData,
+        debug: "FREE_ASTROLOGY_API_KEY is missing in Cloudflare Worker secrets"
+      });
+    }
+
+    const endpointsToTry = [
+      "https://json.freeastrologyapi.com/panchang",
+      "https://json.freeastrologyapi.com/complete-panchang"
+    ];
+
+    let lastError = null;
+
+    for (const endpoint of endpointsToTry) {
+      try {
+        const apiRes = await fetch(endpoint, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": c.env.FREE_ASTROLOGY_API_KEY
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const apiText = await apiRes.text();
+
+        let apiData;
+        try {
+          apiData = JSON.parse(apiText);
+        } catch {
+          apiData = { raw: apiText };
+        }
+
+        if (apiRes.ok) {
+          return c.json({
+            success: true,
+            source: "real_api",
+            endpoint,
+            place: place || "Dallas",
+            date,
+            requestPayload: payload,
+            panchang: apiData
+          });
+        }
+
+        lastError = {
+          endpoint,
+          status: apiRes.status,
+          response: apiData
+        };
+      } catch (apiErr) {
+        lastError = {
+          endpoint,
+          error: apiErr.message
+        };
+      }
+    }
+
+    return c.json({
+      ...fallbackData,
+      debug: "Real API failed after trying all known endpoints",
+      lastError
+    });
+  } catch (err) {
+    return c.json(
+      {
+        success: false,
+        message: "Panchang generation failed",
+        error: err.message
+      },
+      500
+    );
+  }
 });
 
 app.post("/api/ai/chat-basic", async (c) => {
@@ -269,9 +364,12 @@ app.post("/api/stripe/create-checkout-session", async (c) => {
   }
 
   if (!c.env.STRIPE_SECRET_KEY || !c.env.STRIPE_PRO_PRICE_ID) {
-    return c.json({
-      message: "Stripe is not configured yet"
-    }, 500);
+    return c.json(
+      {
+        message: "Stripe is not configured yet"
+      },
+      500
+    );
   }
 
   const stripe = new Stripe(c.env.STRIPE_SECRET_KEY);

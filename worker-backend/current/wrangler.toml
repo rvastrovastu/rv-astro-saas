@@ -3,6 +3,12 @@ main = "src/index.js"
 compatibility_date = "2026-04-30"
 compatibility_flags = ["nodejs_compat"]
 
+workers_dev = true
+
+[[routes]]
+pattern = "api.rvastrovastu.com"
+custom_domain = true
+
 [vars]
 FRONTEND_URL = "https://www.rvastrovastu.com"
 JWT_SECRET = "rvastro_super_secure_jwt_secret_2026"
