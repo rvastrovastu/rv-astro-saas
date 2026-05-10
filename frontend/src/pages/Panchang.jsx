@@ -1,5 +1,10 @@
 import { useState } from "react";
-import { getDailyPanchang } from "../api/panchang";
+//import { getDailyPanchang } from "../api/panchang";
+import API from "../utils/api";
+
+export const getDailyPanchang = (data) => {
+  return API.post("/panchang/daily", data);
+};
 
 export default function Panchang() {
   const [form, setForm] = useState({
