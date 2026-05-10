@@ -18,6 +18,9 @@ export default function Panchang() {
       setLoading(true);
 
       const res = await getDailyPanchang(form);
+
+      console.log("PANCHANG API RESPONSE:", res.data);
+
       setData(res.data);
     } catch (err) {
       console.error("Panchang fetch failed:", err);
@@ -28,6 +31,28 @@ export default function Panchang() {
   };
 
   const p = data?.panchang || {};
+  const raw = data?.rawPanchang || {};
+
+  const getValue = (...values) => {
+    for (const value of values) {
+      if (value === undefined || value === null || value === "") continue;
+
+      if (typeof value === "object") {
+        return (
+          value.name ||
+          value.value ||
+          value.full_name ||
+          value.start ||
+          value.end ||
+          JSON.stringify(value)
+        );
+      }
+
+      return value;
+    }
+
+    return "N/A";
+  };
 
   return (
     <div style={styles.container}>
@@ -82,34 +107,36 @@ export default function Panchang() {
       {data && (
         <div style={styles.result}>
           <div style={styles.headerCard}>
-            <h2>🕉️ Panchang for {data.place}</h2>
-            <p>{data.date}</p>
+            <h2>🕉️ Panchang for {data.place || form.place}</h2>
+            <p>{data.date || form.date}</p>
             <p style={styles.source}>
               Source: {data.source === "real_api" ? "Real Panchang API" : "Fallback Demo Data"}
             </p>
+
+            {data.debug && <p style={styles.debug}>Debug: {data.debug}</p>}
           </div>
 
           <div style={styles.grid}>
-            <Info title="Tithi" value={p.tithi?.name || p.tithi || "N/A"} />
-            <Info title="Nakshatra" value={p.nakshatra?.name || p.nakshatra || "N/A"} />
-            <Info title="Yoga" value={p.yoga?.name || p.yoga || "N/A"} />
-            <Info title="Karana" value={p.karana?.name || p.karana || "N/A"} />
-            <Info title="Sunrise" value={p.sunrise || p.sun_rise || "N/A"} />
-            <Info title="Sunset" value={p.sunset || p.sun_set || "N/A"} />
-            <Info title="Moonrise" value={p.moonrise || p.moon_rise || "N/A"} />
-            <Info title="Moonset" value={p.moonset || p.moon_set || "N/A"} />
+            <Info title="Tithi" value={getValue(p.tithi, p.tithi?.name, raw?.output?.tithi, raw?.tithi)} />
+            <Info title="Nakshatra" value={getValue(p.nakshatra, p.nakshatra?.name, raw?.output?.nakshatra, raw?.nakshatra)} />
+            <Info title="Yoga" value={getValue(p.yoga, p.yoga?.name, raw?.output?.yoga, raw?.yoga)} />
+            <Info title="Karana" value={getValue(p.karana, p.karana?.name, raw?.output?.karana, raw?.karana)} />
+            <Info title="Sunrise" value={getValue(p.sunrise, p.sun_rise, raw?.output?.sunrise, raw?.sunrise)} />
+            <Info title="Sunset" value={getValue(p.sunset, p.sun_set, raw?.output?.sunset, raw?.sunset)} />
+            <Info title="Moonrise" value={getValue(p.moonrise, p.moon_rise, raw?.output?.moonrise, raw?.moonrise)} />
+            <Info title="Moonset" value={getValue(p.moonset, p.moon_set, raw?.output?.moonset, raw?.moonset)} />
           </div>
 
           <h2 style={styles.sectionTitle}> शुभ / अशुभ समय</h2>
 
           <div style={styles.grid}>
-            <Info title="Rahu Kaal" value={p.rahuKaal || p.rahu_kaal || "N/A"} danger />
-            <Info title="Gulika Kaal" value={p.gulikaKaal || p.gulika_kaal || "N/A"} />
-            <Info title="Yama Gandam" value={p.yamaGandam || p.yama_gandam || "N/A"} danger />
-            <Info title="Abhijit Muhurat" value={p.abhijitMuhurat || p.abhijit_muhurat || "N/A"} good />
-            <Info title="Brahma Muhurat" value={p.brahmaMuhurat || p.brahma_muhurat || "N/A"} good />
-            <Info title="Amrit Kaal" value={p.amritKaal || p.amrit_kaal || "N/A"} good />
-            <Info title="Dur Muhurat" value={p.durMuhurat || p.dur_muhurat || "N/A"} danger />
+            <Info title="Rahu Kaal" value={getValue(p.rahuKaal, p.rahu_kaal, p.rahukaal, raw?.output?.rahuKaal, raw?.output?.rahu_kaal)} danger />
+            <Info title="Gulika Kaal" value={getValue(p.gulikaKaal, p.gulika_kaal, p.gulika, raw?.output?.gulikaKaal)} />
+            <Info title="Yama Gandam" value={getValue(p.yamaGandam, p.yama_gandam, p.yamagandam, raw?.output?.yamaGandam)} danger />
+            <Info title="Abhijit Muhurat" value={getValue(p.abhijitMuhurat, p.abhijit_muhurat, raw?.output?.abhijitMuhurat)} good />
+            <Info title="Brahma Muhurat" value={getValue(p.brahmaMuhurat, p.brahma_muhurat, raw?.output?.brahmaMuhurat)} good />
+            <Info title="Amrit Kaal" value={getValue(p.amritKaal, p.amrit_kaal, raw?.output?.amritKaal)} good />
+            <Info title="Dur Muhurat" value={getValue(p.durMuhurat, p.dur_muhurat, raw?.output?.durMuhurat)} danger />
           </div>
 
           <div style={styles.muhuratBox}>
@@ -139,7 +166,7 @@ function Info({ title, value, good, danger }) {
       }}
     >
       <span style={styles.label}>{title}</span>
-      <b>{String(value)}</b>
+      <b>{String(value || "N/A")}</b>
     </div>
   );
 }
@@ -214,6 +241,12 @@ const styles = {
   source: {
     fontSize: 12,
     opacity: 0.65
+  },
+
+  debug: {
+    fontSize: 12,
+    opacity: 0.7,
+    color: "#ffcc66"
   },
 
   grid: {
