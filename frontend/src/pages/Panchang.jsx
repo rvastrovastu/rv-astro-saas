@@ -6,14 +6,14 @@ export const getDailyPanchang = (data) => {
   return API.post("/panchang/daily", data);
 };
 
-export default function Panchang() {
-  const [form, setForm] = useState({
-    date: new Date().toISOString().split("T")[0],
-    place: "Dallas",
-    lat: 32.7767,
-    lon: -96.797,
-    tzone: -5
-  });
+// export default function Panchang() {
+//   const [form, setForm] = useState({
+//     date: new Date().toISOString().split("T")[0],
+//     place: "Dallas",
+//     lat: 32.7767,
+//     lon: -96.797,
+//     tzone: -5
+//   });
 
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
