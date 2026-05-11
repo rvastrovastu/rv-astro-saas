@@ -13,26 +13,61 @@ export default function Panchang() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const getValue = (...values) => {
-    for (const value of values) {
-      if (value === undefined || value === null || value === "") continue;
+ const isEmpty = (value) => {
+  return (
+    value === undefined ||
+    value === null ||
+    value === "" ||
+    value === "N/A" ||
+    value === "NA"
+  );
+};
 
-      if (typeof value === "object") {
-        return (
-          value.name ||
-          value.value ||
-          value.full_name ||
-          value.start ||
-          value.end ||
-          JSON.stringify(value)
-        );
-      }
+const deepFind = (obj, possibleKeys = []) => {
+  if (!obj || typeof obj !== "object") return null;
 
-      return value;
+  for (const key of possibleKeys) {
+    if (!isEmpty(obj[key])) return obj[key];
+  }
+
+  for (const value of Object.values(obj)) {
+    if (value && typeof value === "object") {
+      const found = deepFind(value, possibleKeys);
+      if (!isEmpty(found)) return found;
     }
+  }
 
-    return "N/A";
-  };
+  return null;
+};
+
+const formatValue = (value) => {
+  if (isEmpty(value)) return "N/A";
+
+  if (typeof value === "object") {
+    return (
+      value.name ||
+      value.value ||
+      value.full_name ||
+      value.start ||
+      value.end ||
+      value.start_time ||
+      value.end_time ||
+      JSON.stringify(value)
+    );
+  }
+
+  return value;
+};
+
+const getValue = (keys, ...values) => {
+  for (const value of values) {
+    if (!isEmpty(value)) return formatValue(value);
+  }
+
+  const rawValue = deepFind(raw, keys);
+
+  return formatValue(rawValue);
+};
 
   const fetchPanchang = async () => {
     try {
