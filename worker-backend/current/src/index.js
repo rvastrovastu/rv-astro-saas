@@ -204,6 +204,12 @@ app.post("/api/match/kundali", async (c) => {
     }
   });
 });
+app.get("/api/panchang/daily", (c) => {
+  return c.json({
+    success: true,
+    message: "Panchang API is live. Use POST method for data."
+  });
+});
 
 app.post("/api/panchang/daily", async (c) => {
   try {
