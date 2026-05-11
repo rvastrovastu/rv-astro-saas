@@ -1,42 +1,17 @@
 import { useState } from "react";
-//import { getDailyPanchang } from "../api/panchang";
-import API from "../utils/api";
+import { getDailyPanchang } from "../api/panchang";
 
-export const getDailyPanchang = (data) => {
-  return API.post("/panchang/daily", data);
-};
-
-// export default function Panchang() {
-//   const [form, setForm] = useState({
-//     date: new Date().toISOString().split("T")[0],
-//     place: "Dallas",
-//     lat: 32.7767,
-//     lon: -96.797,
-//     tzone: -5
-//   });
+export default function Panchang() {
+  const [form, setForm] = useState({
+    date: new Date().toISOString().split("T")[0],
+    place: "Dallas",
+    lat: 32.7767,
+    lon: -96.797,
+    tzone: -5
+  });
 
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
-
-  const fetchPanchang = async () => {
-    try {
-      setLoading(true);
-
-      const res = await getDailyPanchang(form);
-
-      console.log("PANCHANG API RESPONSE:", res.data);
-
-      setData(res.data);
-    } catch (err) {
-      console.error("Panchang fetch failed:", err);
-      alert(err?.response?.data?.message || "Failed to load Panchang");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const p = data?.panchang || {};
-  const raw = data?.rawPanchang || {};
 
   const getValue = (...values) => {
     for (const value of values) {
@@ -58,6 +33,25 @@ export const getDailyPanchang = (data) => {
 
     return "N/A";
   };
+
+  const fetchPanchang = async () => {
+    try {
+      setLoading(true);
+
+      const res = await getDailyPanchang(form);
+      console.log("PANCHANG API RESPONSE:", res.data);
+
+      setData(res.data);
+    } catch (err) {
+      console.error("Panchang fetch failed:", err);
+      alert(err?.response?.data?.message || "Failed to load Panchang");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const p = data?.panchang || {};
+  const raw = data?.rawPanchang || {};
 
   return (
     <div style={styles.container}>
@@ -115,7 +109,10 @@ export const getDailyPanchang = (data) => {
             <h2>🕉️ Panchang for {data.place || form.place}</h2>
             <p>{data.date || form.date}</p>
             <p style={styles.source}>
-              Source: {data.source === "real_api" ? "Real Panchang API" : "Fallback Demo Data"}
+              Source:{" "}
+              {data.source === "real_api"
+                ? "Real Panchang API"
+                : "Fallback Demo Data"}
             </p>
 
             {data.debug && <p style={styles.debug}>Debug: {data.debug}</p>}
@@ -132,10 +129,10 @@ export const getDailyPanchang = (data) => {
             <Info title="Moonset" value={getValue(p.moonset, p.moon_set, raw?.output?.moonset, raw?.moonset)} />
           </div>
 
-          <h2 style={styles.sectionTitle}> शुभ / अशुभ समय</h2>
+          <h2 style={styles.sectionTitle}>शुभ / अशुभ समय</h2>
 
           <div style={styles.grid}>
-            <Info title="Rahu Kaal" value={getValue(p.rahuKaal, p.rahu_kaal, p.rahukaal, raw?.output?.rahuKaal, raw?.output?.rahu_kaal)} danger />
+            <Info title="Rahu Kaal" value={getValue(p.rahuKaal, p.rahu_kaal, p.rahukaal, raw?.output?.rahuKaal)} danger />
             <Info title="Gulika Kaal" value={getValue(p.gulikaKaal, p.gulika_kaal, p.gulika, raw?.output?.gulikaKaal)} />
             <Info title="Yama Gandam" value={getValue(p.yamaGandam, p.yama_gandam, p.yamagandam, raw?.output?.yamaGandam)} danger />
             <Info title="Abhijit Muhurat" value={getValue(p.abhijitMuhurat, p.abhijit_muhurat, raw?.output?.abhijitMuhurat)} good />
@@ -156,6 +153,7 @@ export const getDailyPanchang = (data) => {
       )}
     </div>
   );
+}
 
 function Info({ title, value, good, danger }) {
   return (
@@ -183,13 +181,11 @@ const styles = {
     padding: 20,
     fontFamily: "Arial"
   },
-
   title: {
     color: "#D4AF37",
     textAlign: "center",
     fontSize: 36
   },
-
   subtitle: {
     maxWidth: 800,
     margin: "0 auto 25px",
@@ -197,7 +193,6 @@ const styles = {
     opacity: 0.75,
     lineHeight: 1.6
   },
-
   form: {
     maxWidth: 760,
     margin: "20px auto",
@@ -209,7 +204,6 @@ const styles = {
     gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
     gap: 12
   },
-
   input: {
     padding: 12,
     borderRadius: 10,
@@ -217,7 +211,6 @@ const styles = {
     background: "#1a1a1a",
     color: "white"
   },
-
   btn: {
     padding: 12,
     borderRadius: 10,
@@ -227,12 +220,10 @@ const styles = {
     fontWeight: "bold",
     cursor: "pointer"
   },
-
   result: {
     maxWidth: 1000,
     margin: "25px auto"
   },
-
   headerCard: {
     background: "#111",
     border: "1px solid #D4AF37",
@@ -241,24 +232,20 @@ const styles = {
     textAlign: "center",
     marginBottom: 20
   },
-
   source: {
     fontSize: 12,
     opacity: 0.65
   },
-
   debug: {
     fontSize: 12,
     opacity: 0.7,
     color: "#ffcc66"
   },
-
   grid: {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
     gap: 14
   },
-
   infoCard: {
     background: "#111",
     padding: 16,
@@ -267,17 +254,14 @@ const styles = {
     flexDirection: "column",
     gap: 8
   },
-
   label: {
     fontSize: 12,
     opacity: 0.65
   },
-
   sectionTitle: {
     color: "#D4AF37",
     marginTop: 30
   },
-
   muhuratBox: {
     marginTop: 25,
     background: "#111",
