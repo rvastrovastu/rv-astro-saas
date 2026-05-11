@@ -156,7 +156,6 @@ export const getDailyPanchang = (data) => {
       )}
     </div>
   );
-}
 
 function Info({ title, value, good, danger }) {
   return (
