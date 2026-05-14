@@ -204,6 +204,7 @@ app.post("/api/match/kundali", async (c) => {
     }
   });
 });
+
 app.get("/api/panchang/daily", (c) => {
   return c.json({
     success: true,
@@ -224,59 +225,50 @@ app.post("/api/panchang/daily", async (c) => {
     const payload = {
       year: selectedDate.getFullYear(),
       month: selectedDate.getMonth() + 1,
-      date: selectedDate.getDate(),
-      hours: 6,
-      minutes: 0,
-      seconds: 0,
+      day: selectedDate.getDate(),
+      hour: 6,
+      minute: 0,
       latitude: Number(lat) || 32.7767,
       longitude: Number(lon) || -96.797,
       timezone: Number(tzone) || -5,
+      city: place || "Dallas",
       config: {
         observation_point: "topocentric",
         ayanamsha: "lahiri"
       }
     };
 
-    const fallbackData = {
-      success: true,
-      source: "fallback",
-      debug: "FREE_ASTROLOGY_API_KEY missing or real API failed",
-      place: place || "Dallas",
-      date,
-      location: {
-        lat: Number(lat) || 32.7767,
-        lon: Number(lon) || -96.797,
-        tzone: Number(tzone) || -5
-      },
-      panchang: {
-        tithi: "Shukla Paksha",
-        nakshatra: "Rohini",
-        yoga: "Shubha Yoga",
-        karana: "Bava",
-        sunrise: "06:22 AM",
-        sunset: "07:58 PM",
-        moonrise: "09:12 PM",
-        moonset: "07:45 AM",
-        rahuKaal: "10:30 AM - 12:00 PM",
-        gulikaKaal: "07:30 AM - 09:00 AM",
-        yamaGandam: "03:00 PM - 04:30 PM",
-        abhijitMuhurat: "12:05 PM - 12:55 PM",
-        brahmaMuhurat: "04:35 AM - 05:20 AM",
-        amritKaal: "06:10 PM - 07:42 PM",
-        durMuhurat: "01:15 PM - 02:05 PM"
-      }
+    const fallbackPanchang = {
+      tithi: "Unavailable from API",
+      nakshatra: "Unavailable from API",
+      yoga: "Unavailable from API",
+      karana: "Unavailable from API",
+      sunrise: "Unavailable from API",
+      sunset: "Unavailable from API",
+      moonrise: "Unavailable from API",
+      moonset: "Unavailable from API",
+      rahuKaal: "Unavailable from API",
+      gulikaKaal: "Unavailable from API",
+      yamaGandam: "Unavailable from API",
+      abhijitMuhurat: "Unavailable from API",
+      brahmaMuhurat: "Unavailable from API",
+      amritKaal: "Unavailable from API",
+      durMuhurat: "Unavailable from API"
     };
 
     if (!c.env.FREE_ASTROLOGY_API_KEY) {
       return c.json({
-        ...fallbackData,
-        debug: "FREE_ASTROLOGY_API_KEY is missing in Cloudflare Worker secrets"
+        success: true,
+        source: "fallback",
+        debug: "FREE_ASTROLOGY_API_KEY is missing in Cloudflare Worker secrets",
+        place: place || "Dallas",
+        date,
+        panchang: fallbackPanchang
       });
     }
 
     const endpointsToTry = [
-      "https://json.freeastrologyapi.com/panchang",
-      "https://json.freeastrologyapi.com/complete-panchang"
+  	"https://api.freeastroapi.com/api/v2/vedic/panchang",
     ];
 
     let lastError = null;
@@ -301,7 +293,13 @@ app.post("/api/panchang/daily", async (c) => {
           apiData = { raw: apiText };
         }
 
-        if (apiRes.ok) {
+        const deprecated =
+          apiData?.output === "Deprecated :-(" ||
+          apiData?.message?.toLowerCase?.().includes("deprecated");
+
+        if (apiRes.ok && !deprecated) {
+          const root = apiData?.output || apiData?.data || apiData?.panchang || apiData;
+
           return c.json({
             success: true,
             source: "real_api",
@@ -309,13 +307,84 @@ app.post("/api/panchang/daily", async (c) => {
             place: place || "Dallas",
             date,
             requestPayload: payload,
-            panchang: apiData
+            panchang: {
+              tithi: root?.tithi?.name || root?.tithi || root?.Tithi || "N/A",
+              nakshatra:
+                root?.nakshatra?.name ||
+                root?.nakshatra ||
+                root?.Nakshatra ||
+                "N/A",
+              yoga: root?.yoga?.name || root?.yoga || root?.Yoga || "N/A",
+              karana: root?.karana?.name || root?.karana || root?.Karana || "N/A",
+              sunrise:
+                root?.sunrise ||
+                root?.sun_rise ||
+                root?.sun?.rise ||
+                root?.Sunrise ||
+                "N/A",
+              sunset:
+                root?.sunset ||
+                root?.sun_set ||
+                root?.sun?.set ||
+                root?.Sunset ||
+                "N/A",
+              moonrise:
+                root?.moonrise ||
+                root?.moon_rise ||
+                root?.moon?.rise ||
+                root?.Moonrise ||
+                "N/A",
+              moonset:
+                root?.moonset ||
+                root?.moon_set ||
+                root?.moon?.set ||
+                root?.Moonset ||
+                "N/A",
+              rahuKaal:
+                root?.rahuKaal ||
+                root?.rahu_kaal ||
+                root?.rahukaal ||
+                root?.rahu_kalam ||
+                "N/A",
+              gulikaKaal:
+                root?.gulikaKaal ||
+                root?.gulika_kaal ||
+                root?.gulika_kalam ||
+                "N/A",
+              yamaGandam:
+                root?.yamaGandam ||
+                root?.yama_gandam ||
+                root?.yamagandam ||
+                "N/A",
+              abhijitMuhurat:
+                root?.abhijitMuhurat ||
+                root?.abhijit_muhurat ||
+                root?.abhijit ||
+                "N/A",
+              brahmaMuhurat:
+                root?.brahmaMuhurat ||
+                root?.brahma_muhurat ||
+                root?.brahma ||
+                "N/A",
+              amritKaal:
+                root?.amritKaal ||
+                root?.amrit_kaal ||
+                root?.amrit ||
+                "N/A",
+              durMuhurat:
+                root?.durMuhurat ||
+                root?.dur_muhurat ||
+                root?.durmuhurat ||
+                "N/A"
+            },
+            rawPanchang: apiData
           });
         }
 
         lastError = {
           endpoint,
           status: apiRes.status,
+          deprecated,
           response: apiData
         };
       } catch (apiErr) {
@@ -327,9 +396,13 @@ app.post("/api/panchang/daily", async (c) => {
     }
 
     return c.json({
-      ...fallbackData,
-      debug: "Real API failed after trying all known endpoints",
-      lastError
+      success: true,
+      source: "fallback",
+      debug: "Real Panchang API did not return usable Panchang fields",
+      lastError,
+      place: place || "Dallas",
+      date,
+      panchang: fallbackPanchang
     });
   } catch (err) {
     return c.json(

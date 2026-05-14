@@ -13,62 +13,6 @@ export default function Panchang() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
 
- const isEmpty = (value) => {
-  return (
-    value === undefined ||
-    value === null ||
-    value === "" ||
-    value === "N/A" ||
-    value === "NA"
-  );
-};
-
-const deepFind = (obj, possibleKeys = []) => {
-  if (!obj || typeof obj !== "object") return null;
-
-  for (const key of possibleKeys) {
-    if (!isEmpty(obj[key])) return obj[key];
-  }
-
-  for (const value of Object.values(obj)) {
-    if (value && typeof value === "object") {
-      const found = deepFind(value, possibleKeys);
-      if (!isEmpty(found)) return found;
-    }
-  }
-
-  return null;
-};
-
-const formatValue = (value) => {
-  if (isEmpty(value)) return "N/A";
-
-  if (typeof value === "object") {
-    return (
-      value.name ||
-      value.value ||
-      value.full_name ||
-      value.start ||
-      value.end ||
-      value.start_time ||
-      value.end_time ||
-      JSON.stringify(value)
-    );
-  }
-
-  return value;
-};
-
-const getValue = (keys, ...values) => {
-  for (const value of values) {
-    if (!isEmpty(value)) return formatValue(value);
-  }
-
-  const rawValue = deepFind(raw, keys);
-
-  return formatValue(rawValue);
-};
-
   const fetchPanchang = async () => {
     try {
       setLoading(true);
@@ -87,6 +31,26 @@ const getValue = (keys, ...values) => {
 
   const p = data?.panchang || {};
   const raw = data?.rawPanchang || {};
+
+  const formatRange = (value) => {
+    if (value?.start && value?.end) {
+      return `${value.start} - ${value.end}`;
+    }
+
+    return value || "N/A";
+  };
+
+  const formatKarana = () => {
+    if (Array.isArray(raw?.karanas) && raw.karanas.length > 0) {
+      return raw.karanas.map((k) => k.name).join(", ");
+    }
+
+    if (Array.isArray(p?.karanas) && p.karanas.length > 0) {
+      return p.karanas.map((k) => k.name).join(", ");
+    }
+
+    return p.karana?.name || p.karana || raw?.request_time_panchang?.karana?.name || "N/A";
+  };
 
   return (
     <div style={styles.container}>
@@ -154,26 +118,26 @@ const getValue = (keys, ...values) => {
           </div>
 
           <div style={styles.grid}>
-            <Info title="Tithi" value={getValue(p.tithi, p.tithi?.name, raw?.output?.tithi, raw?.tithi)} />
-            <Info title="Nakshatra" value={getValue(p.nakshatra, p.nakshatra?.name, raw?.output?.nakshatra, raw?.nakshatra)} />
-            <Info title="Yoga" value={getValue(p.yoga, p.yoga?.name, raw?.output?.yoga, raw?.yoga)} />
-            <Info title="Karana" value={getValue(p.karana, p.karana?.name, raw?.output?.karana, raw?.karana)} />
-            <Info title="Sunrise" value={getValue(p.sunrise, p.sun_rise, raw?.output?.sunrise, raw?.sunrise)} />
-            <Info title="Sunset" value={getValue(p.sunset, p.sun_set, raw?.output?.sunset, raw?.sunset)} />
-            <Info title="Moonrise" value={getValue(p.moonrise, p.moon_rise, raw?.output?.moonrise, raw?.moonrise)} />
-            <Info title="Moonset" value={getValue(p.moonset, p.moon_set, raw?.output?.moonset, raw?.moonset)} />
+            <Info title="Tithi" value={p.tithi || raw?.tithi?.name || "N/A"} />
+            <Info title="Nakshatra" value={p.nakshatra || raw?.nakshatra?.name || "N/A"} />
+            <Info title="Yoga" value={p.yoga || raw?.yoga?.name || "N/A"} />
+            <Info title="Karana" value={formatKarana()} />
+            <Info title="Sunrise" value={p.sunrise || raw?.sunrise || "N/A"} />
+            <Info title="Sunset" value={p.sunset || raw?.sunset || "N/A"} />
+            <Info title="Moonrise" value={p.moonrise || raw?.moonrise || "N/A"} />
+            <Info title="Moonset" value={p.moonset || raw?.moonset || "N/A"} />
           </div>
 
           <h2 style={styles.sectionTitle}>शुभ / अशुभ समय</h2>
 
           <div style={styles.grid}>
-            <Info title="Rahu Kaal" value={getValue(p.rahuKaal, p.rahu_kaal, p.rahukaal, raw?.output?.rahuKaal)} danger />
-            <Info title="Gulika Kaal" value={getValue(p.gulikaKaal, p.gulika_kaal, p.gulika, raw?.output?.gulikaKaal)} />
-            <Info title="Yama Gandam" value={getValue(p.yamaGandam, p.yama_gandam, p.yamagandam, raw?.output?.yamaGandam)} danger />
-            <Info title="Abhijit Muhurat" value={getValue(p.abhijitMuhurat, p.abhijit_muhurat, raw?.output?.abhijitMuhurat)} good />
-            <Info title="Brahma Muhurat" value={getValue(p.brahmaMuhurat, p.brahma_muhurat, raw?.output?.brahmaMuhurat)} good />
-            <Info title="Amrit Kaal" value={getValue(p.amritKaal, p.amrit_kaal, raw?.output?.amritKaal)} good />
-            <Info title="Dur Muhurat" value={getValue(p.durMuhurat, p.dur_muhurat, raw?.output?.durMuhurat)} danger />
+            <Info title="Rahu Kaal" value={formatRange(p.rahuKaal || raw?.rahu_kalam)} danger />
+            <Info title="Gulika Kaal" value={formatRange(p.gulikaKaal || raw?.gulika_kalam)} />
+            <Info title="Yama Gandam" value={formatRange(p.yamaGandam || raw?.yama_gandam)} danger />
+            <Info title="Abhijit Muhurat" value={formatRange(p.abhijitMuhurat || raw?.abhijit_muhurat)} good />
+            <Info title="Brahma Muhurat" value={formatRange(p.brahmaMuhurat || raw?.brahma_muhurat)} good />
+            <Info title="Amrit Kaal" value={formatRange(p.amritKaal || raw?.amrit_kaal)} good />
+            <Info title="Dur Muhurat" value={formatRange(p.durMuhurat || raw?.dur_muhurat)} danger />
           </div>
 
           <div style={styles.muhuratBox}>
