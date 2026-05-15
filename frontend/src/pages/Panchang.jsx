@@ -106,6 +106,18 @@ export default function Panchang() {
             {data.debug && <p style={styles.debug}>Debug: {data.debug}</p>}
           </div>
 
+          <h2 style={styles.sectionTitle}>शुभ / अशुभ समय</h2>
+
+          <div style={styles.grid}>
+            <Info title="Rahu Kaal" value={range(raw.rahu_kalam) || range(p.rahuKaal)} danger />
+            <Info title="Gulika Kaal" value={range(raw.gulika_kalam) || range(p.gulikaKaal)} />
+            <Info title="Yama Gandam" value={range(raw.yama_gandam) || range(p.yamaGandam)} danger />
+            <Info title="Abhijit Muhurat" value={range(raw.abhijit_muhurat) || range(p.abhijitMuhurat)} good />
+            <Info title="Brahma Muhurat" value={range(raw.brahma_muhurat) || range(p.brahmaMuhurat)} good />
+            <Info title="Amrit Kaal" value={range(raw.amrit_kaal) || range(p.amritKaal)} good />
+            <Info title="Dur Muhurat" value={range(raw.dur_muhurat) || range(p.durMuhurat)} danger />
+          </div>
+
           <div style={styles.grid}>
             <Info title="Date" value={raw.date || data?.date || "N/A"} />
             <Info title="Location" value={raw.location ? `${raw.location.lat}, ${raw.location.lng}` : "N/A"} />
@@ -130,7 +142,6 @@ export default function Panchang() {
             <Info title="Yoga Ends At" value={raw.yoga?.ends_at || "N/A"} />
 
             <Info title="Karanas" value={karanasText} />
-            <Info title="Rahu Kalam" value={range(raw.rahu_kalam || p.rahuKaal)} danger />
           </div>
 
           <h2 style={styles.sectionTitle}>Request Time Panchang</h2>
@@ -145,29 +156,6 @@ export default function Panchang() {
             <Info title="Current Karana" value={raw.request_time_panchang?.karana?.name || "N/A"} />
             <Info title="Sun Sign" value={raw.request_time_panchang?.sun_sign?.name || "N/A"} />
             <Info title="Moon Sign" value={raw.request_time_panchang?.moon_sign?.name || "N/A"} />
-          </div>
-
-          <h2 style={styles.sectionTitle}>Calculation Metadata</h2>
-
-          <div style={styles.grid}>
-            <Info title="Endpoint Version" value={raw.metadata?.endpoint_version || "N/A"} />
-            <Info title="Ruleset" value={raw.metadata?.ruleset_version || "N/A"} />
-            <Info title="Ayanamsha" value={raw.metadata?.ayanamsha || "N/A"} />
-            <Info title="Timezone Used" value={raw.metadata?.timezone_used || "N/A"} />
-            <Info title="Calculation Basis" value={raw.metadata?.calculation_basis || "N/A"} />
-            <Info title="Request Local Time" value={raw.metadata?.request_local_time || "N/A"} />
-          </div>
-
-          <h2 style={styles.sectionTitle}>शुभ / अशुभ समय</h2>
-
-          <div style={styles.grid}>
-            <Info title="Rahu Kaal" value={range(p.rahuKaal || raw?.rahu_kalam)} danger />
-            <Info title="Gulika Kaal" value={range(p.gulikaKaal || raw?.gulika_kalam)} />
-            <Info title="Yama Gandam" value={range(p.yamaGandam || raw?.yama_gandam)} danger />
-            <Info title="Abhijit Muhurat" value={range(p.abhijitMuhurat || raw?.abhijit_muhurat)} good />
-            <Info title="Brahma Muhurat" value={range(p.brahmaMuhurat || raw?.brahma_muhurat)} good />
-            <Info title="Amrit Kaal" value={range(p.amritKaal || raw?.amrit_kaal)} good />
-            <Info title="Dur Muhurat" value={range(p.durMuhurat || raw?.dur_muhurat)} danger />
           </div>
 
           <div style={styles.muhuratBox}>
