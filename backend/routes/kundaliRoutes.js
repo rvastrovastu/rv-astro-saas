@@ -18,13 +18,13 @@ const router = express.Router();
 // =====================================================
 router.post("/generate", async (req, res) => {
   try {
-    const { name, dob, time, place } = req.body;
+    const { name, dob, time, place, lat, lng } = req.body;
 
     // ================= VALIDATION =================
-    if (!dob || !time || !place) {
+    if (!dob || !time || (!place && (!lat || !lng))) {
       return res.status(400).json({
         success: false,
-        message: "Birth details required"
+        message: "Birth details required: either place or latitude/longitude must be provided"
       });
     }
 
@@ -103,7 +103,18 @@ router.post("/generate", async (req, res) => {
       source: getPlanetPositions ? "EPHEMERIS_ENGINE" : "FALLBACK_ENGINE",
 
       kundali: {
-        native: { name, dob, time, place },
+        native: {
+          name,
+          dob,
+          time,
+          place,
+          lat: req.body.lat,
+          lng: req.body.lng,
+          tz_str: req.body.tz_str,
+          ayanamsha: req.body.ayanamsha,
+          house_system: req.body.house_system,
+          node_type: req.body.node_type
+        },
 
         ascendant,
         sunSign,

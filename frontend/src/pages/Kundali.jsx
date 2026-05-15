@@ -160,6 +160,21 @@ function BasicKundaliResult({ kundali }) {
         </div>
 
         <div style={styles.resultTile}>
+          <span style={styles.label}>Latitude</span>
+          <b>{kundali.native?.lat ?? "N/A"}</b>
+        </div>
+
+        <div style={styles.resultTile}>
+          <span style={styles.label}>Longitude</span>
+          <b>{kundali.native?.lng ?? "N/A"}</b>
+        </div>
+
+        <div style={styles.resultTile}>
+          <span style={styles.label}>Timezone</span>
+          <b>{kundali.native?.tz_str || kundali.meta?.timezone_used || "N/A"}</b>
+        </div>
+
+        <div style={styles.resultTile}>
           <span style={styles.label}>Ascendant</span>
           <b>{kundali.ascendant || "N/A"}</b>
         </div>
@@ -175,9 +190,32 @@ function BasicKundaliResult({ kundali }) {
         </div>
 
         <div style={styles.resultTile}>
-          <span style={styles.label}>Engine</span>
-          <b>{kundali.meta?.engine || "N/A"}</b>
+          <span style={styles.label}>Source</span>
+          <b>{kundali.source || kundali.meta?.engine || "N/A"}</b>
         </div>
+
+        <div style={styles.resultTile}>
+          <span style={styles.label}>Ayanamsha</span>
+          <b>{kundali.meta?.ayanamsha || "N/A"}</b>
+        </div>
+
+        <div style={styles.resultTile}>
+          <span style={styles.label}>House System</span>
+          <b>{kundali.meta?.house_system || "N/A"}</b>
+        </div>
+
+        <div style={styles.resultTile}>
+          <span style={styles.label}>Node Type</span>
+          <b>{kundali.meta?.node_type || "N/A"}</b>
+        </div>
+      </div>
+
+      <div style={styles.sadeSatiBox}>
+        <h3 style={styles.sectionTitle}>🌒 Sade Sati</h3>
+        <p>
+          <b>Status:</b> {kundali.sade_sati?.active ? "Active" : "Not active"}
+        </p>
+        <p>{kundali.sade_sati?.description || "No Sade Sati details available."}</p>
       </div>
 
       <h3 style={styles.sectionTitle}>🪐 Planet Positions</h3>
@@ -230,7 +268,9 @@ export default function Kundali() {
     name: "",
     dob: "",
     time: "",
-    place: ""
+    place: "",
+    lat: "",
+    lng: ""
   });
 
   const [kundali, setKundali] = useState(null);
@@ -252,8 +292,18 @@ export default function Kundali() {
   const isPro = user?.plan === "pro";
 
   const generateKundali = async () => {
-    if (!form.name || !form.dob || !form.time || !form.place) {
-      alert("Please fill Name, DOB, Time, and Place.");
+    if (!form.name || !form.dob || !form.time) {
+      alert("Please fill Name, DOB, and Time.");
+      return;
+    }
+
+    if ((!form.place || !form.place.trim()) && (!form.lat || !form.lng)) {
+      alert("Please provide either a Place or both Latitude and Longitude.");
+      return;
+    }
+
+    if ((form.lat && !form.lng) || (!form.lat && form.lng)) {
+      alert("Please enter both Latitude and Longitude, or leave both blank and provide a Place.");
       return;
     }
 
@@ -330,6 +380,63 @@ export default function Kundali() {
           value={form.place}
           onChange={(e) => setForm({ ...form, place: e.target.value })}
         />
+
+        <div style={styles.rowInputs}>
+          <input
+            placeholder="Latitude"
+            style={{ ...styles.input, flex: 1 }}
+            value={form.lat}
+            onChange={(e) => setForm({ ...form, lat: e.target.value })}
+          />
+          <input
+            placeholder="Longitude"
+            style={{ ...styles.input, flex: 1, marginLeft: 10 }}
+            value={form.lng}
+            onChange={(e) => setForm({ ...form, lng: e.target.value })}
+          />
+        </div>
+
+        <input
+          placeholder="Timezone (e.g. Asia/Kolkata or AUTO)"
+          style={styles.input}
+          value={form.tz_str}
+          onChange={(e) => setForm({ ...form, tz_str: e.target.value })}
+        />
+
+        <div style={styles.rowInputs}>
+          <select
+            value={form.ayanamsha}
+            style={{ ...styles.input, flex: 1 }}
+            onChange={(e) => setForm({ ...form, ayanamsha: e.target.value })}
+          >
+            <option value="lahiri">Lahiri</option>
+            <option value="krishna">Krishna</option>
+            <option value="raman">Raman</option>
+            <option value="fagan_bradley">Fagan-Bradley</option>
+            <option value="delhi">Delhi</option>
+          </select>
+
+          <select
+            value={form.house_system}
+            style={{ ...styles.input, flex: 1, marginLeft: 10 }}
+            onChange={(e) => setForm({ ...form, house_system: e.target.value })}
+          >
+            <option value="whole_sign">Whole Sign</option>
+            <option value="placidus">Placidus</option>
+            <option value="kochi">Kochi</option>
+            <option value="sripathi">Sripathi</option>
+            <option value="porphyry">Porphyry</option>
+          </select>
+        </div>
+
+        <select
+          value={form.node_type}
+          style={styles.input}
+          onChange={(e) => setForm({ ...form, node_type: e.target.value })}
+        >
+          <option value="mean">Mean Node</option>
+          <option value="true">True Node</option>
+        </select>
 
         <button onClick={generateKundali} style={styles.button} disabled={loading}>
           {loading ? "Generating..." : "Generate Free Kundali"}
@@ -450,6 +557,12 @@ const styles = {
     color: "white"
   },
 
+  rowInputs: {
+    display: "flex",
+    gap: 10,
+    alignItems: "center"
+  },
+
   button: {
     padding: "12px 15px",
     background: "#D4AF37",
@@ -471,6 +584,14 @@ const styles = {
     padding: 20,
     borderRadius: 12,
     border: "1px solid #333"
+  },
+
+  sadeSatiBox: {
+    marginTop: 20,
+    padding: 14,
+    background: "#141414",
+    border: "1px solid #333",
+    borderRadius: 10
   },
 
   summaryGrid: {

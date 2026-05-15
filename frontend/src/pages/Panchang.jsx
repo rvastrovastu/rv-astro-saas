@@ -32,8 +32,25 @@ export default function Panchang() {
   const raw = data?.rawPanchang || {};
   const p = data?.panchang || {};
 
-  const range = (obj) =>
-    obj?.start && obj?.end ? `${obj.start} - ${obj.end}` : "N/A";
+  const formatTiming = (value) => {
+    if (value == null || value === "") return "N/A";
+    if (typeof value === "string") return value;
+    if (typeof value === "object") {
+      if (value.start && value.end) return `${value.start} - ${value.end}`;
+      if (value.from && value.to) return `${value.from} - ${value.to}`;
+      if (value.name) return value.name;
+      return JSON.stringify(value);
+    }
+    return String(value);
+  };
+
+  const panchangValue = (...values) => {
+    for (const value of values) {
+      const formatted = formatTiming(value);
+      if (formatted !== "N/A") return formatted;
+    }
+    return "N/A";
+  };
 
   const karanasText = Array.isArray(raw.karanas)
     ? raw.karanas
@@ -109,13 +126,40 @@ export default function Panchang() {
           <h2 style={styles.sectionTitle}>शुभ / अशुभ समय</h2>
 
           <div style={styles.grid}>
-            <Info title="Rahu Kaal" value={range(raw.rahu_kalam) || range(p.rahuKaal)} danger />
-            <Info title="Gulika Kaal" value={range(raw.gulika_kalam) || range(p.gulikaKaal)} />
-            <Info title="Yama Gandam" value={range(raw.yama_gandam) || range(p.yamaGandam)} danger />
-            <Info title="Abhijit Muhurat" value={range(raw.abhijit_muhurat) || range(p.abhijitMuhurat)} good />
-            <Info title="Brahma Muhurat" value={range(raw.brahma_muhurat) || range(p.brahmaMuhurat)} good />
-            <Info title="Amrit Kaal" value={range(raw.amrit_kaal) || range(p.amritKaal)} good />
-            <Info title="Dur Muhurat" value={range(raw.dur_muhurat) || range(p.durMuhurat)} danger />
+            <Info
+              title="Rahu Kaal"
+              value={panchangValue(p.rahuKaal, raw.rahu_kalam, raw.rahu_kaal)}
+              danger
+            />
+            <Info
+              title="Gulika Kaal"
+              value={panchangValue(p.gulikaKaal, raw.gulika_kalam, raw.gulika_kaal)}
+            />
+            <Info
+              title="Yama Gandam"
+              value={panchangValue(p.yamaGandam, raw.yama_gandam, raw.yamagandam)}
+              danger
+            />
+            <Info
+              title="Abhijit Muhurat"
+              value={panchangValue(p.abhijitMuhurat, raw.abhijit_muhurat, raw.abhijit)}
+              good
+            />
+            <Info
+              title="Brahma Muhurat"
+              value={panchangValue(p.brahmaMuhurat, raw.brahma_muhurat, raw.brahma)}
+              good
+            />
+            <Info
+              title="Amrit Kaal"
+              value={panchangValue(p.amritKaal, raw.amrit_kaal, raw.amrit)}
+              good
+            />
+            <Info
+              title="Dur Muhurat"
+              value={panchangValue(p.durMuhurat, raw.dur_muhurat, raw.durmuhurat)}
+              danger
+            />
           </div>
 
           <div style={styles.grid}>
