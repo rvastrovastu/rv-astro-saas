@@ -29,28 +29,17 @@ export default function Panchang() {
     }
   };
 
-  const p = data?.panchang || {};
   const raw = data?.rawPanchang || {};
+  const p = data?.panchang || {};
 
-  const formatRange = (value) => {
-    if (value?.start && value?.end) {
-      return `${value.start} - ${value.end}`;
-    }
+  const range = (obj) =>
+    obj?.start && obj?.end ? `${obj.start} - ${obj.end}` : "N/A";
 
-    return value || "N/A";
-  };
-
-  const formatKarana = () => {
-    if (Array.isArray(raw?.karanas) && raw.karanas.length > 0) {
-      return raw.karanas.map((k) => k.name).join(", ");
-    }
-
-    if (Array.isArray(p?.karanas) && p.karanas.length > 0) {
-      return p.karanas.map((k) => k.name).join(", ");
-    }
-
-    return p.karana?.name || p.karana || raw?.request_time_panchang?.karana?.name || "N/A";
-  };
+  const karanasText = Array.isArray(raw.karanas)
+    ? raw.karanas
+        .map((k) => `${k.name} until ${k.ends_at}`)
+        .join(", ")
+    : "N/A";
 
   return (
     <div style={styles.container}>
@@ -118,26 +107,67 @@ export default function Panchang() {
           </div>
 
           <div style={styles.grid}>
-            <Info title="Tithi" value={p.tithi || raw?.tithi?.name || "N/A"} />
-            <Info title="Nakshatra" value={p.nakshatra || raw?.nakshatra?.name || "N/A"} />
-            <Info title="Yoga" value={p.yoga || raw?.yoga?.name || "N/A"} />
-            <Info title="Karana" value={formatKarana()} />
-            <Info title="Sunrise" value={p.sunrise || raw?.sunrise || "N/A"} />
-            <Info title="Sunset" value={p.sunset || raw?.sunset || "N/A"} />
-            <Info title="Moonrise" value={p.moonrise || raw?.moonrise || "N/A"} />
-            <Info title="Moonset" value={p.moonset || raw?.moonset || "N/A"} />
+            <Info title="Date" value={raw.date || data?.date || "N/A"} />
+            <Info title="Location" value={raw.location ? `${raw.location.lat}, ${raw.location.lng}` : "N/A"} />
+            <Info title="Sunrise" value={raw.sunrise || p.sunrise || "N/A"} />
+            <Info title="Sunset" value={raw.sunset || p.sunset || "N/A"} />
+
+            <Info title="Weekday" value={raw.weekday?.name || "N/A"} />
+            <Info title="Lunar Month" value={raw.lunar_month?.name || "N/A"} />
+            <Info title="Vikram Samvat" value={raw.lunar_month?.vikram_samvat || "N/A"} />
+            <Info title="Amanta" value={raw.lunar_month?.amanta ? "Yes" : "No"} />
+
+            <Info title="Tithi" value={raw.tithi?.name || p.tithi || "N/A"} />
+            <Info title="Tithi Paksha" value={raw.tithi?.paksha || "N/A"} />
+            <Info title="Tithi Ends At" value={raw.tithi?.ends_at || "N/A"} />
+
+            <Info title="Nakshatra" value={raw.nakshatra?.name || p.nakshatra || "N/A"} />
+            <Info title="Nakshatra Pada" value={raw.nakshatra?.pada || "N/A"} />
+            <Info title="Nakshatra Lord" value={raw.nakshatra?.lord || "N/A"} />
+            <Info title="Nakshatra Ends At" value={raw.nakshatra?.ends_at || "N/A"} />
+
+            <Info title="Yoga" value={raw.yoga?.name || p.yoga || "N/A"} />
+            <Info title="Yoga Ends At" value={raw.yoga?.ends_at || "N/A"} />
+
+            <Info title="Karanas" value={karanasText} />
+            <Info title="Rahu Kalam" value={range(raw.rahu_kalam || p.rahuKaal)} danger />
+          </div>
+
+          <h2 style={styles.sectionTitle}>Request Time Panchang</h2>
+
+          <div style={styles.grid}>
+            <Info title="Current Tithi" value={raw.request_time_panchang?.tithi?.name || "N/A"} />
+            <Info title="Current Paksha" value={raw.request_time_panchang?.tithi?.paksha || "N/A"} />
+            <Info title="Current Nakshatra" value={raw.request_time_panchang?.nakshatra?.name || "N/A"} />
+            <Info title="Current Nakshatra Pada" value={raw.request_time_panchang?.nakshatra?.pada || "N/A"} />
+            <Info title="Current Nakshatra Lord" value={raw.request_time_panchang?.nakshatra?.lord || "N/A"} />
+            <Info title="Current Yoga" value={raw.request_time_panchang?.yoga?.name || "N/A"} />
+            <Info title="Current Karana" value={raw.request_time_panchang?.karana?.name || "N/A"} />
+            <Info title="Sun Sign" value={raw.request_time_panchang?.sun_sign?.name || "N/A"} />
+            <Info title="Moon Sign" value={raw.request_time_panchang?.moon_sign?.name || "N/A"} />
+          </div>
+
+          <h2 style={styles.sectionTitle}>Calculation Metadata</h2>
+
+          <div style={styles.grid}>
+            <Info title="Endpoint Version" value={raw.metadata?.endpoint_version || "N/A"} />
+            <Info title="Ruleset" value={raw.metadata?.ruleset_version || "N/A"} />
+            <Info title="Ayanamsha" value={raw.metadata?.ayanamsha || "N/A"} />
+            <Info title="Timezone Used" value={raw.metadata?.timezone_used || "N/A"} />
+            <Info title="Calculation Basis" value={raw.metadata?.calculation_basis || "N/A"} />
+            <Info title="Request Local Time" value={raw.metadata?.request_local_time || "N/A"} />
           </div>
 
           <h2 style={styles.sectionTitle}>शुभ / अशुभ समय</h2>
 
           <div style={styles.grid}>
-            <Info title="Rahu Kaal" value={formatRange(p.rahuKaal || raw?.rahu_kalam)} danger />
-            <Info title="Gulika Kaal" value={formatRange(p.gulikaKaal || raw?.gulika_kalam)} />
-            <Info title="Yama Gandam" value={formatRange(p.yamaGandam || raw?.yama_gandam)} danger />
-            <Info title="Abhijit Muhurat" value={formatRange(p.abhijitMuhurat || raw?.abhijit_muhurat)} good />
-            <Info title="Brahma Muhurat" value={formatRange(p.brahmaMuhurat || raw?.brahma_muhurat)} good />
-            <Info title="Amrit Kaal" value={formatRange(p.amritKaal || raw?.amrit_kaal)} good />
-            <Info title="Dur Muhurat" value={formatRange(p.durMuhurat || raw?.dur_muhurat)} danger />
+            <Info title="Rahu Kaal" value={range(p.rahuKaal || raw?.rahu_kalam)} danger />
+            <Info title="Gulika Kaal" value={range(p.gulikaKaal || raw?.gulika_kalam)} />
+            <Info title="Yama Gandam" value={range(p.yamaGandam || raw?.yama_gandam)} danger />
+            <Info title="Abhijit Muhurat" value={range(p.abhijitMuhurat || raw?.abhijit_muhurat)} good />
+            <Info title="Brahma Muhurat" value={range(p.brahmaMuhurat || raw?.brahma_muhurat)} good />
+            <Info title="Amrit Kaal" value={range(p.amritKaal || raw?.amrit_kaal)} good />
+            <Info title="Dur Muhurat" value={range(p.durMuhurat || raw?.dur_muhurat)} danger />
           </div>
 
           <div style={styles.muhuratBox}>
