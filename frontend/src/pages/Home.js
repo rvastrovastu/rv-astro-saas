@@ -199,7 +199,7 @@ export default function Home() {
           ))}
 
           <a
-            href="https://wa.me/1234567890?text=Hi%20I%20need%20astro%20consultation"
+            href="https://wa.me/5137650184?text=Hi%20I%20need%20astro%20consultation"
             target="_blank"
             rel="noreferrer"
             style={styles.toolCard}
