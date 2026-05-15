@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route } from "react-router-dom";
 
 import Home from "./pages/Home";
 import Booking from "./pages/Booking";
@@ -14,7 +14,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <div style={{ fontFamily: "Arial" }}>
         <Routes>
           {/* PUBLIC ROUTES */}
@@ -89,7 +89,7 @@ function App() {
           💬 WhatsApp
         </a>
       </div>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 
