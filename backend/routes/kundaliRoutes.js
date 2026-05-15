@@ -19,6 +19,7 @@ const router = express.Router();
 router.post("/generate", async (req, res) => {
   try {
     const { name, dob, time, place, lat, lng } = req.body;
+    const advanced = req.query.advanced === "true";
 
     // ================= VALIDATION =================
     if (!dob || !time || (!place && (!lat || !lng))) {
@@ -32,7 +33,7 @@ router.post("/generate", async (req, res) => {
     // 🪐 STEP 1: REAL ASTRO API
     // =====================================================
     try {
-      const apiResult = await getKundaliFromAPI(req.body);
+      const apiResult = await getKundaliFromAPI(req.body, advanced);
 
       if (apiResult?.success && apiResult?.kundali) {
         return res.json({

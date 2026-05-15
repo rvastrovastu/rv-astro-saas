@@ -1,10 +1,24 @@
 import { calculateKundaliMatch } from "../services/matchService.js";
+import { getKundaliFromAPI } from "../utils/astrologyAPI.js";
 
 export const matchKundali = async (req, res) => {
   try {
-    const { kundali1, kundali2 } = req.body;
+    const { kundali1, kundali2, boy, girl } = req.body;
 
-    const result = calculateKundaliMatch(kundali1, kundali2);
+    let firstKundali = kundali1;
+    let secondKundali = kundali2;
+
+    if (!firstKundali && boy) {
+      const apiResult = await getKundaliFromAPI(boy);
+      firstKundali = apiResult?.kundali || boy;
+    }
+
+    if (!secondKundali && girl) {
+      const apiResult = await getKundaliFromAPI(girl);
+      secondKundali = apiResult?.kundali || girl;
+    }
+
+    const result = calculateKundaliMatch(firstKundali, secondKundali);
 
     res.json({
       success: true,

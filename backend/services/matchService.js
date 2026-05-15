@@ -1,5 +1,15 @@
+const normalizePlanetDegree = (planet) => {
+  if (planet == null) return 0;
+  if (typeof planet === "number") return planet;
+  if (typeof planet === "object") {
+    return Number(planet.degree ?? planet.longitude ?? planet.absolute_degree ?? 0) || 0;
+  }
+  return 0;
+};
+
 export const getMoonSign = (moonDeg) => {
-  return Math.floor(moonDeg / 30);
+  const degree = normalizePlanetDegree(moonDeg);
+  return Math.floor(degree / 30);
 };
 
 // ================================

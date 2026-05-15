@@ -171,7 +171,22 @@ function BasicKundaliResult({ kundali }) {
 
         <div style={styles.resultTile}>
           <span style={styles.label}>Timezone</span>
-          <b>{kundali.native?.tz_str || kundali.meta?.timezone_used || "N/A"}</b>
+          <b>{kundali.native?.tz_str || kundali.location?.timezone || kundali.meta?.timezone_used || "N/A"}</b>
+        </div>
+
+        <div style={styles.resultTile}>
+          <span style={styles.label}>Ayanamsha</span>
+          <b>{kundali.native?.ayanamsha || kundali.meta?.ayanamsha || "N/A"}</b>
+        </div>
+
+        <div style={styles.resultTile}>
+          <span style={styles.label}>House System</span>
+          <b>{kundali.native?.house_system || kundali.meta?.house_system || "N/A"}</b>
+        </div>
+
+        <div style={styles.resultTile}>
+          <span style={styles.label}>Node Type</span>
+          <b>{kundali.native?.node_type || kundali.meta?.node_type || "N/A"}</b>
         </div>
 
         <div style={styles.resultTile}>
@@ -190,23 +205,18 @@ function BasicKundaliResult({ kundali }) {
         </div>
 
         <div style={styles.resultTile}>
+          <span style={styles.label}>Ascendant Degree</span>
+          <b>{(kundali.ascendant_degree ?? kundali.ascendantRaw?.degree) || "N/A"}</b>
+        </div>
+
+        <div style={styles.resultTile}>
           <span style={styles.label}>Source</span>
           <b>{kundali.source || kundali.meta?.engine || "N/A"}</b>
         </div>
 
         <div style={styles.resultTile}>
-          <span style={styles.label}>Ayanamsha</span>
-          <b>{kundali.meta?.ayanamsha || "N/A"}</b>
-        </div>
-
-        <div style={styles.resultTile}>
-          <span style={styles.label}>House System</span>
-          <b>{kundali.meta?.house_system || "N/A"}</b>
-        </div>
-
-        <div style={styles.resultTile}>
-          <span style={styles.label}>Node Type</span>
-          <b>{kundali.meta?.node_type || "N/A"}</b>
+          <span style={styles.label}>Calculation Time</span>
+          <b>{kundali.meta?.calculation_time || kundali.metadata?.calculation_time || "N/A"}</b>
         </div>
       </div>
 
@@ -230,6 +240,21 @@ function BasicKundaliResult({ kundali }) {
             <p>
               Degree: <b>{data?.degree ?? "N/A"}°</b>
             </p>
+            <p>
+              House: <b>{data?.house ?? "N/A"}</b>
+            </p>
+            <p>
+              Retrograde: <b>{data?.retrograde ? "Yes" : "No"}</b>
+            </p>
+            <p>
+              Nakshatra: <b>{data?.nakshatra || "N/A"}</b>
+            </p>
+            <p>
+              Pada: <b>{data?.pada || "N/A"}</b>
+            </p>
+            <p>
+              Nakshatra Lord: <b>{data?.nakshatra_lord || "N/A"}</b>
+            </p>
           </div>
         ))}
       </div>
@@ -237,10 +262,12 @@ function BasicKundaliResult({ kundali }) {
       <h3 style={styles.sectionTitle}>🏠 Houses</h3>
 
       <div style={styles.houseGrid}>
-        {Object.entries(kundali.houses || {}).map(([house, sign]) => (
+        {Object.entries(kundali.houses || {}).map(([house, houseData]) => (
           <div key={house} style={styles.houseCard}>
             <b>{house.replace("_", " ")}</b>
-            <span>{String(sign)}</span>
+            <span>{houseData?.sign || String(houseData) || "N/A"}</span>
+            {houseData?.degree != null && <span>Degree: {houseData.degree}°</span>}
+            {houseData?.lord && <span>Lord: {houseData.lord}</span>}
           </div>
         ))}
       </div>
@@ -251,9 +278,102 @@ function BasicKundaliResult({ kundali }) {
         {(kundali.dasha || []).map((d, index) => (
           <div key={index} style={styles.dashaCard}>
             <b>{d.planet}</b>
-            <span>{d.years} years</span>
+            <span>{d.years ? `${d.years} years` : "N/A"}</span>
+            {d.from && <span>From: {d.from}</span>}
+            {d.to && <span>To: {d.to}</span>}
           </div>
         ))}
+      </div>
+
+      {kundali.yoga && kundali.yoga.length > 0 && (
+        <>
+          <h3 style={styles.sectionTitle}>🧿 Yogas</h3>
+          <div style={styles.yogaGrid}>
+            {kundali.yoga.map((item, idx) => (
+              <div key={idx} style={styles.yogaCard}>
+                <b>{item.name || item.title || `Yoga ${idx + 1}`}</b>
+                <span>{item.description || item.details || item.text || "-"}</span>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+function AdvancedKundaliFeatures({ kundali }) {
+  const advanced = kundali?.advanced || {};
+
+  const renderItems = (items) => {
+    if (!items) return <p style={styles.proTip}>No data available.</p>;
+    if (Array.isArray(items)) {
+      return items.map((item, idx) => (
+        <div key={idx} style={styles.advancedCard}>
+          <b>{item.title || item.name || item.planet || `Item ${idx + 1}`}</b>
+          <span>{item.description || item.details || item.text || JSON.stringify(item)}</span>
+        </div>
+      ));
+    }
+    if (typeof items === "object") {
+      return Object.entries(items).map(([key, value]) => (
+        <div key={key} style={styles.advancedCard}>
+          <b>{key}</b>
+          <span>{typeof value === "object" ? JSON.stringify(value) : String(value)}</span>
+        </div>
+      ));
+    }
+    return <p>{String(items)}</p>;
+  };
+
+  return (
+    <div style={styles.advancedSection}>
+      <h2 style={styles.sectionTitle}>🌟 Pro Advanced Astrology</h2>
+      <div style={styles.advancedGrid}>
+        <div style={styles.advancedBox}>
+          <h3>🔮 Full Calculate</h3>
+          {advanced.fullCalculate ? renderItems(advanced.fullCalculate) : <p>No full calculation details.</p>}
+        </div>
+
+        <div style={styles.advancedBox}>
+          <h3>📈 Dasha Insights</h3>
+          {renderItems(advanced.dashaInsights?.dasha || advanced.dashaInsights || advanced.dasha)}
+        </div>
+
+        <div style={styles.advancedBox}>
+          <h3>🌌 Gochar Timeline</h3>
+          {renderItems(advanced.gocharTimeline?.timeline || advanced.gocharTimeline)}
+        </div>
+
+        <div style={styles.advancedBox}>
+          <h3>✨ Gochar Insights</h3>
+          {renderItems(advanced.gocharInsights?.insights || advanced.gocharInsights)}
+        </div>
+
+        <div style={styles.advancedBox}>
+          <h3>🧿 Yoga Detection</h3>
+          {renderItems(advanced.yogas || kundali.yoga)}
+        </div>
+
+        <div style={styles.advancedBox}>
+          <h3>💪 Planetary Strength</h3>
+          {renderItems(advanced.strength?.strength || advanced.strength)}
+        </div>
+
+        <div style={styles.advancedBox}>
+          <h3>📐 Divisional Charts</h3>
+          {renderItems(advanced.divisionalCharts?.vargas || advanced.divisionalCharts)}
+        </div>
+
+        <div style={styles.advancedBox}>
+          <h3>🕉️ Muhurat Search</h3>
+          {renderItems(advanced.panchang || advanced.muhurat || advanced.muhuratSearch)}
+        </div>
+
+        <div style={styles.advancedBox}>
+          <h3>🪄 Personalized Muhurat</h3>
+          {renderItems(advanced.personalizedMuhurat || advanced.personalized_muhurat || advanced.panchang)}
+        </div>
       </div>
     </div>
   );
@@ -270,11 +390,16 @@ export default function Kundali() {
     time: "",
     place: "",
     lat: "",
-    lng: ""
+    lng: "",
+    tz_str: "AUTO",
+    ayanamsha: "lahiri",
+    house_system: "whole_sign",
+    node_type: "mean"
   });
 
   const [kundali, setKundali] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [showDebug, setShowDebug] = useState(false);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -313,9 +438,10 @@ export default function Kundali() {
       let res;
 
       try {
-        res = await getKundali(form);
+        res = await getKundali(form, isPro);
       } catch {
-        res = await axios.post("http://localhost:5001/api/kundali/generate", form);
+        const url = `http://localhost:5001/api/kundali/generate${isPro ? "?advanced=true" : ""}`;
+        res = await axios.post(url, form);
       }
 
       setKundali(res.data?.kundali || res.data);
@@ -445,7 +571,24 @@ export default function Kundali() {
 
       {loading && <p style={styles.center}>⏳ Calculating planetary positions...</p>}
 
+      {kundali && (
+        <div style={styles.debugControls}>
+          <button
+            style={styles.secondaryButton}
+            onClick={() => setShowDebug((prev) => !prev)}
+          >
+            {showDebug ? "Hide Kundali Debug" : "Show Kundali Debug"}
+          </button>
+        </div>
+      )}
+
+      {showDebug && kundali && (
+        <pre style={styles.debugPanel}>{JSON.stringify(kundali, null, 2)}</pre>
+      )}
+
       {kundali && <BasicKundaliResult kundali={kundali} />}
+
+      {kundali && isPro && <AdvancedKundaliFeatures kundali={kundali} />}
 
       {kundali && isPro && (
         <div style={styles.kundaliWrapper}>
@@ -739,6 +882,72 @@ const styles = {
     borderRadius: 12,
     background: "#111",
     textAlign: "center"
+  },
+  debugControls: {
+    maxWidth: 1000,
+    margin: "12px auto",
+    textAlign: "center"
+  },
+  debugPanel: {
+    maxWidth: 1000,
+    margin: "12px auto",
+    background: "#050505",
+    border: "1px solid #333",
+    borderRadius: 12,
+    padding: 16,
+    fontSize: 12,
+    lineHeight: 1.4,
+    overflowX: "auto",
+    whiteSpace: "pre-wrap",
+    wordBreak: "break-word"
+  },
+  yogaGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+    gap: 12,
+    marginTop: 16
+  },
+  yogaCard: {
+    background: "#151515",
+    padding: 14,
+    borderRadius: 10,
+    border: "1px solid #333"
+  },
+
+  advancedSection: {
+    maxWidth: 1000,
+    margin: "20px auto",
+    background: "#111",
+    padding: 20,
+    borderRadius: 12,
+    border: "1px solid #333"
+  },
+  advancedGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+    gap: 14,
+    marginTop: 18
+  },
+  advancedBox: {
+    background: "#141414",
+    padding: 14,
+    borderRadius: 10,
+    border: "1px solid #333",
+    minHeight: 120
+  },
+  advancedCard: {
+    background: "#1b1b1b",
+    padding: 12,
+    borderRadius: 10,
+    border: "1px solid #2c2c2c",
+    marginBottom: 10,
+    display: "flex",
+    flexDirection: "column",
+    gap: 6
+  },
+  proTip: {
+    color: "#bbb",
+    fontSize: 14
   },
 
   upgradeBtn: {

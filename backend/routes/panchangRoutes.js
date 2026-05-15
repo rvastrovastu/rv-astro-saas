@@ -1,15 +1,38 @@
 import express from "express";
+import { getDailyPanchang } from "../utils/astrologyAPI.js";
 
 const router = express.Router();
 
 router.post("/daily", async (req, res) => {
   try {
-    const { date, place, lat, lon, tzone } = req.body;
+    const date = req.body.date;
+    const place = req.body.place || req.body.city;
+    const lat = req.body.lat ?? req.body.latitude;
+    const lon = req.body.lon ?? req.body.lng ?? req.body.longitude;
+    const tzone = req.body.tzone ?? req.body.tz_str ?? req.body.timezone ?? "AUTO";
 
     if (!date) {
       return res.status(400).json({
         success: false,
         message: "Date is required"
+      });
+    }
+
+    const result = await getDailyPanchang({ date, place, lat, lon, tzone });
+
+    if (result?.success && result?.panchang) {
+      return res.json({
+        success: true,
+        source: result.source,
+        date,
+        place: place || "Unknown",
+        location: {
+          lat: lat || 0,
+          lon: lon || 0,
+          tzone
+        },
+        panchang: result.panchang,
+        raw: result.raw
       });
     }
 
@@ -21,7 +44,7 @@ router.post("/daily", async (req, res) => {
       location: {
         lat: lat || 32.7767,
         lon: lon || -96.797,
-        tzone: tzone || -5
+        tzone
       },
       panchang: {
         tithi: "Shukla Paksha",

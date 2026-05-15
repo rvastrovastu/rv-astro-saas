@@ -12,6 +12,7 @@ export default function Panchang() {
 
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [showDebug, setShowDebug] = useState(false);
 
   const fetchPanchang = async () => {
     try {
@@ -29,16 +30,30 @@ export default function Panchang() {
     }
   };
 
-  const raw = data?.rawPanchang || {};
-  const p = data?.panchang || {};
+  const raw =
+    data?.rawPanchang ||
+    data?.data?.rawPanchang ||
+    data?.raw ||
+    data?.data?.raw ||
+    data?.output?.raw ||
+    {};
+  const p =
+    data?.panchang ||
+    data?.data?.panchang ||
+    data?.data ||
+    data?.output ||
+    data ||
+    {};
 
   const formatTiming = (value) => {
     if (value == null || value === "") return "N/A";
     if (typeof value === "string") return value;
+    if (typeof value === "number") return String(value);
     if (typeof value === "object") {
       if (value.start && value.end) return `${value.start} - ${value.end}`;
       if (value.from && value.to) return `${value.from} - ${value.to}`;
       if (value.name) return value.name;
+      if (value.value) return String(value.value);
       return JSON.stringify(value);
     }
     return String(value);
@@ -51,6 +66,17 @@ export default function Panchang() {
     }
     return "N/A";
   };
+
+  const requestTime =
+    raw.request_time_panchang ||
+    raw.requestTimePanchang ||
+    raw.request_time ||
+    raw.requestTime ||
+    p.request_time_panchang ||
+    p.requestTime ||
+    p.request_time ||
+    p.requestTime ||
+    {};
 
   const karanasText = Array.isArray(raw.karanas)
     ? raw.karanas
@@ -121,6 +147,32 @@ export default function Panchang() {
             </p>
 
             {data.debug && <p style={styles.debug}>Debug: {data.debug}</p>}
+            <button
+              onClick={() => setShowDebug((prev) => !prev)}
+              style={styles.debugBtn}
+            >
+              {showDebug ? "Hide API Debug" : "Show API Debug"}
+            </button>
+          </div>
+
+          {showDebug && (
+            <pre style={styles.debugPanel}>
+              {JSON.stringify({ data, raw, p, requestTime }, null, 2)}
+            </pre>
+          )}
+
+          <h2 style={styles.sectionTitle}>Request Time Panchang</h2>
+
+          <div style={styles.grid}>
+            <Info title="Current Tithi" value={panchangValue(requestTime?.tithi?.name, requestTime?.tithi, requestTime?.tithi?.value)} />
+            <Info title="Current Paksha" value={panchangValue(requestTime?.tithi?.paksha, requestTime?.paksha, requestTime?.paksha?.name)} />
+            <Info title="Current Nakshatra" value={panchangValue(requestTime?.nakshatra?.name, requestTime?.nakshatra, requestTime?.nakshatra?.value)} />
+            <Info title="Current Nakshatra Pada" value={panchangValue(requestTime?.nakshatra?.pada, requestTime?.nakshatra?.pada?.name)} />
+            <Info title="Current Nakshatra Lord" value={panchangValue(requestTime?.nakshatra?.lord, requestTime?.nakshatra?.lord?.name)} />
+            <Info title="Current Yoga" value={panchangValue(requestTime?.yoga?.name, requestTime?.yoga, requestTime?.yoga?.value)} />
+            <Info title="Current Karana" value={panchangValue(requestTime?.karana?.name, requestTime?.karana, requestTime?.karana?.value)} />
+            <Info title="Sun Sign" value={panchangValue(requestTime?.sun_sign?.name, requestTime?.sun_sign, requestTime?.sunSign)} />
+            <Info title="Moon Sign" value={panchangValue(requestTime?.moon_sign?.name, requestTime?.moon_sign, requestTime?.moonSign)} />
           </div>
 
           <h2 style={styles.sectionTitle}>शुभ / अशुभ समय</h2>
@@ -128,45 +180,45 @@ export default function Panchang() {
           <div style={styles.grid}>
             <Info
               title="Rahu Kaal"
-              value={panchangValue(p.rahuKaal, raw.rahu_kalam, raw.rahu_kaal)}
+              value={panchangValue(p.rahuKaal, p.rahu_kaal, raw.rahu_kalam, raw.rahu_kaal, raw.rahukaal)}
               danger
             />
             <Info
               title="Gulika Kaal"
-              value={panchangValue(p.gulikaKaal, raw.gulika_kalam, raw.gulika_kaal)}
+              value={panchangValue(p.gulikaKaal, p.gulika_kaal, raw.gulika_kalam, raw.gulika_kaal)}
             />
             <Info
               title="Yama Gandam"
-              value={panchangValue(p.yamaGandam, raw.yama_gandam, raw.yamagandam)}
+              value={panchangValue(p.yamaGandam, p.yama_gandam, raw.yama_gandam, raw.yamagandam)}
               danger
             />
             <Info
               title="Abhijit Muhurat"
-              value={panchangValue(p.abhijitMuhurat, raw.abhijit_muhurat, raw.abhijit)}
+              value={panchangValue(p.abhijitMuhurat, p.abhijit_muhurat, raw.abhijit_muhurat, raw.abhijit)}
               good
             />
             <Info
               title="Brahma Muhurat"
-              value={panchangValue(p.brahmaMuhurat, raw.brahma_muhurat, raw.brahma)}
+              value={panchangValue(p.brahmaMuhurat, p.brahma_muhurat, raw.brahma_muhurat, raw.brahma)}
               good
             />
             <Info
               title="Amrit Kaal"
-              value={panchangValue(p.amritKaal, raw.amrit_kaal, raw.amrit)}
+              value={panchangValue(p.amritKaal, p.amrit_kaal, raw.amrit_kaal, raw.amrit)}
               good
             />
             <Info
               title="Dur Muhurat"
-              value={panchangValue(p.durMuhurat, raw.dur_muhurat, raw.durmuhurat)}
+              value={panchangValue(p.durMuhurat, p.dur_muhurat, raw.dur_muhurat, raw.durmuhurat, raw.durMuhurat)}
               danger
             />
           </div>
 
           <div style={styles.grid}>
-            <Info title="Date" value={raw.date || data?.date || "N/A"} />
-            <Info title="Location" value={raw.location ? `${raw.location.lat}, ${raw.location.lng}` : "N/A"} />
-            <Info title="Sunrise" value={raw.sunrise || p.sunrise || "N/A"} />
-            <Info title="Sunset" value={raw.sunset || p.sunset || "N/A"} />
+            <Info title="Date" value={panchangValue(raw.date, data?.date, p.date)} />
+            <Info title="Location" value={panchangValue(raw.location ? `${raw.location.lat}, ${raw.location.lng}` : null, p.location?.lat && p.location?.lon ? `${p.location.lat}, ${p.location.lon}` : null, `${form.lat}, ${form.lon}`)} />
+            <Info title="Sunrise" value={panchangValue(raw.sunrise, p.sunrise, p.sun_rise, p.sun?.rise)} />
+            <Info title="Sunset" value={panchangValue(raw.sunset, p.sunset, p.sun_set, p.sun?.set)} />
 
             <Info title="Weekday" value={raw.weekday?.name || "N/A"} />
             <Info title="Lunar Month" value={raw.lunar_month?.name || "N/A"} />
@@ -186,20 +238,6 @@ export default function Panchang() {
             <Info title="Yoga Ends At" value={raw.yoga?.ends_at || "N/A"} />
 
             <Info title="Karanas" value={karanasText} />
-          </div>
-
-          <h2 style={styles.sectionTitle}>Request Time Panchang</h2>
-
-          <div style={styles.grid}>
-            <Info title="Current Tithi" value={raw.request_time_panchang?.tithi?.name || "N/A"} />
-            <Info title="Current Paksha" value={raw.request_time_panchang?.tithi?.paksha || "N/A"} />
-            <Info title="Current Nakshatra" value={raw.request_time_panchang?.nakshatra?.name || "N/A"} />
-            <Info title="Current Nakshatra Pada" value={raw.request_time_panchang?.nakshatra?.pada || "N/A"} />
-            <Info title="Current Nakshatra Lord" value={raw.request_time_panchang?.nakshatra?.lord || "N/A"} />
-            <Info title="Current Yoga" value={raw.request_time_panchang?.yoga?.name || "N/A"} />
-            <Info title="Current Karana" value={raw.request_time_panchang?.karana?.name || "N/A"} />
-            <Info title="Sun Sign" value={raw.request_time_panchang?.sun_sign?.name || "N/A"} />
-            <Info title="Moon Sign" value={raw.request_time_panchang?.moon_sign?.name || "N/A"} />
           </div>
 
           <div style={styles.muhuratBox}>
@@ -301,6 +339,28 @@ const styles = {
     fontSize: 12,
     opacity: 0.7,
     color: "#ffcc66"
+  },
+  debugBtn: {
+    marginTop: 16,
+    padding: "10px 14px",
+    borderRadius: 10,
+    border: "1px solid #666",
+    background: "#222",
+    color: "white",
+    cursor: "pointer"
+  },
+  debugPanel: {
+    marginTop: 20,
+    background: "#121212",
+    border: "1px solid #333",
+    borderRadius: 14,
+    padding: 16,
+    overflowX: "auto",
+    whiteSpace: "pre-wrap",
+    wordBreak: "break-word",
+    fontSize: 12,
+    lineHeight: 1.4,
+    maxHeight: 360
   },
   grid: {
     display: "grid",
