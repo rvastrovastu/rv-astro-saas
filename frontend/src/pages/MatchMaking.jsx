@@ -1,5 +1,5 @@
-import axios from "axios";
 import { useState } from "react";
+import API from "../utils/api";
 
 export default function MatchMaking() {
   const [loading, setLoading] = useState(false);
@@ -37,7 +37,7 @@ export default function MatchMaking() {
     try {
       setLoading(true);
 
-      const res = await axios.post("http://localhost:5001/api/match/kundali", {
+      const res = await API.post("/match/kundali", {
         boy,
         girl
       });

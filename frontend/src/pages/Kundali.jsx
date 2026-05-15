@@ -437,13 +437,7 @@ export default function Kundali() {
 
       let res;
 
-      try {
-        res = await getKundali(form, isPro);
-      } catch {
-        const url = `http://localhost:5001/api/kundali/generate${isPro ? "?advanced=true" : ""}`;
-        res = await axios.post(url, form);
-      }
-
+      res = await getKundali(form, isPro);
       setKundali(res.data?.kundali || res.data);
     } catch (err) {
       console.error("Kundali Generate Error:", err);

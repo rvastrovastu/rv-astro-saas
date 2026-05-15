@@ -1,4 +1,4 @@
-import axios from "axios";
+import API from "../utils/api";
 
 /**
  * ===============================
@@ -6,15 +6,7 @@ import axios from "axios";
  * ===============================
  */
 export const getKundali = (data, advanced = false) => {
-  const url = `http://localhost:5001/api/kundali/generate${advanced ? "?advanced=true" : ""}`;
+  const url = `/kundali/generate${advanced ? "?advanced=true" : ""}`;
 
-  return axios.post(
-    url,
-    data,
-    {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token") || ""}`
-      }
-    }
-  );
+  return API.post(url, data);
 };
