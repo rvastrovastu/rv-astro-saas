@@ -1,7 +1,10 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import BackHomeButton from "../components/BackHomeButton";
 import API from "../utils/api";
 
 export default function MatchMaking() {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
 
@@ -76,6 +79,8 @@ export default function MatchMaking() {
   return (
     <div style={styles.container}>
       <h1 style={styles.title}>💞 Kundali Match Making</h1>
+
+      <BackHomeButton />
 
       <p style={styles.subtitle}>
         Enter Boy and Girl birth details to check Guna Milan, Manglik Dosha,

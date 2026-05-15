@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import BackHomeButton from "../components/BackHomeButton";
 import axios from "axios";
 
 export default function Chatbot() {
@@ -6,6 +7,7 @@ export default function Chatbot() {
   const [chat, setChat] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  const navigate = useNavigate();
   const [user, setUser] = useState({
     name: "",
     dob: "",
@@ -68,6 +70,7 @@ export default function Chatbot() {
   return (
     <div style={styles.container}>
 
+      <BackHomeButton />
       <h2 style={styles.header}>🤖 AI Astrology Chatbot</h2>
 
       {/* ================= USER DETAILS ================= */}

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import { getKundali } from "../api/astrology";
+import BackHomeButton from "../components/BackHomeButton";
 
 /* ================= ZODIAC WHEEL ================= */
 function ZodiacWheel({ kundali }) {
@@ -399,7 +400,6 @@ export default function Kundali() {
 
   const [kundali, setKundali] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [showDebug, setShowDebug] = useState(false);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -454,6 +454,8 @@ export default function Kundali() {
       <p style={styles.subtitle}>
         Generate a free basic Kundali. Login or upgrade to Pro for saving, PDF report, Kundali wheel, Dasha, and AI insights.
       </p>
+
+      <BackHomeButton />
 
       {!isLoggedIn && (
         <div style={styles.guestBanner}>
@@ -564,21 +566,6 @@ export default function Kundali() {
       </div>
 
       {loading && <p style={styles.center}>⏳ Calculating planetary positions...</p>}
-
-      {kundali && (
-        <div style={styles.debugControls}>
-          <button
-            style={styles.secondaryButton}
-            onClick={() => setShowDebug((prev) => !prev)}
-          >
-            {showDebug ? "Hide Kundali Debug" : "Show Kundali Debug"}
-          </button>
-        </div>
-      )}
-
-      {showDebug && kundali && (
-        <pre style={styles.debugPanel}>{JSON.stringify(kundali, null, 2)}</pre>
-      )}
 
       {kundali && <BasicKundaliResult kundali={kundali} />}
 

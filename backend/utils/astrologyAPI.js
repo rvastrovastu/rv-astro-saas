@@ -132,13 +132,20 @@ const buildPanchangPayload = (payload) => {
   const date = new Date(payload.date);
 
   return {
+    question: payload.question || "panchang",
+    date: payload.date,
+    time: payload.time || undefined,
+    language: payload.language || "en",
     year: date.getFullYear(),
     month: date.getMonth() + 1,
     day: date.getDate(),
     city: payload.place || payload.city || undefined,
     lat: payload.lat !== undefined && payload.lat !== "" ? Number(payload.lat) : undefined,
     lng: payload.lon !== undefined && payload.lon !== "" ? Number(payload.lon) : undefined,
-    tz_str: payload.tzone || payload.tz_str || payload.timezone || "AUTO"
+    tz_str: payload.tzone || payload.tz_str || payload.timezone || "AUTO",
+    ayanamsha: payload.ayanamsha || "lahiri",
+    house_system: payload.house_system || "whole_sign",
+    node_type: payload.node_type || "mean"
   };
 };
 

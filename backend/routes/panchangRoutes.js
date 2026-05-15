@@ -9,7 +9,13 @@ router.post("/daily", async (req, res) => {
     const place = req.body.place || req.body.city;
     const lat = req.body.lat ?? req.body.latitude;
     const lon = req.body.lon ?? req.body.lng ?? req.body.longitude;
+    const time = req.body.time || req.body.local_time;
+    const question = req.body.question || req.body.topic || "panchang";
+    const language = req.body.language || "en";
     const tzone = req.body.tzone ?? req.body.tz_str ?? req.body.timezone ?? "AUTO";
+    const ayanamsha = req.body.ayanamsha ?? "lahiri";
+    const house_system = req.body.house_system ?? "whole_sign";
+    const node_type = req.body.node_type ?? "mean";
 
     if (!date) {
       return res.status(400).json({
@@ -18,7 +24,19 @@ router.post("/daily", async (req, res) => {
       });
     }
 
-    const result = await getDailyPanchang({ date, place, lat, lon, tzone });
+    const result = await getDailyPanchang({
+      date,
+      place,
+      lat,
+      lon,
+      time,
+      question,
+      language,
+      tzone,
+      ayanamsha,
+      house_system,
+      node_type
+    });
 
     if (result?.success && result?.panchang) {
       return res.json({

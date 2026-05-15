@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../utils/api";
+import BackHomeButton from "../components/BackHomeButton";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -70,6 +71,7 @@ export default function Login() {
 
   return (
     <div style={styles.container}>
+      <BackHomeButton />
       <div style={styles.card}>
         <div style={styles.logoBox}>
           <div style={styles.logo}>🔮</div>
