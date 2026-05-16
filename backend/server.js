@@ -1,5 +1,4 @@
-import dotenv from "dotenv";
-dotenv.config();
+import 'dotenv/config';
 
 import express from "express";
 import mongoose from "mongoose";
@@ -20,6 +19,7 @@ import profileRoutes from "./routes/profileRoutes.js";
 import aiRoutes from "./routes/aiRoutes.js";
 import kundaliRoutes from "./routes/kundaliRoutes.js";
 import panchangRoutes from "./routes/panchangRoutes.js";
+import westernRoutes from "./routes/westernRoutes.js";
 
 // STRIPE ROUTES
 import stripeRoutes from "./routes/stripe.js";
@@ -33,8 +33,9 @@ const app = express();
 // ========================
 // ENV CHECK
 // ========================
-if (!process.env.MONGO_URI) {
-  console.error("❌ MONGO_URI missing in .env");
+// Allow skipping DB during local/dev testing by setting SKIP_DB=true
+if (!process.env.MONGO_URI && !process.env.SKIP_DB) {
+  console.error("❌ MONGO_URI missing in .env (set SKIP_DB=true to skip DB in dev)");
   process.exit(1);
 }
 
@@ -103,6 +104,7 @@ app.use("/api/ai", aiRoutes);
 app.use("/api/kundali", kundaliRoutes);
 app.use("/api/match", matchRoutes);
 app.use("/api/panchang", panchangRoutes);
+app.use("/api/western", westernRoutes);
 
 // ========================
 // ROUTES: STRIPE SYSTEM
@@ -195,8 +197,15 @@ const connectDB = async () => {
   }
 };
 
-connectDB().then(() => {
+const startServer = () => {
   app.listen(PORT, () => {
     console.log(`🚀 RV Astro SaaS running on port ${PORT}`);
   });
-});
+};
+
+if (process.env.SKIP_DB) {
+  console.warn("⚠️ SKIP_DB=true — starting server without DB connection (dev mode)");
+  startServer();
+} else {
+  connectDB().then(startServer);
+}

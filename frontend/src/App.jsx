@@ -9,6 +9,9 @@ import Panchang from "./pages/Panchang";
 import Pricing from "./pages/Pricing";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
+import BackHomeButton from "./components/BackHomeButton";
+import BirthChart from "./pages/BirthChart";
+import DailyHoroscope from "./pages/DailyHoroscope";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -23,7 +26,9 @@ function App() {
           <Route path="/signup" element={<Login />} />
 
           <Route path="/kundali" element={<Kundali />} />
+          <Route path="/birth-chart" element={<BirthChart />} />
           <Route path="/match-making" element={<MatchMaking />} />
+          <Route path="/daily-horoscope" element={<DailyHoroscope />} />
           <Route path="/panchang" element={<Panchang />} />
           <Route path="/booking" element={<Booking />} />
           <Route path="/pricing" element={<Pricing />} />
@@ -88,6 +93,10 @@ function App() {
         >
           💬 WhatsApp
         </a>
+      </div>
+      {/* GLOBAL BACK HOME BUTTON (bottom center) */}
+      <div style={{ position: "fixed", left: "50%", transform: "translateX(-50%)", bottom: 18, zIndex: 9999 }}>
+        <BackHomeButton style={{ padding: "10px 18px", borderRadius: 22 }} />
       </div>
     </HashRouter>
   );

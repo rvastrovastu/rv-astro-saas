@@ -149,18 +149,28 @@ const buildPanchangPayload = (payload) => {
   };
 };
 
-const fetchFreeAstroEndpoint = async (path, payload) => {
+const fetchFreeAstroEndpoint = async (path, payload = {}, options = {}) => {
   if (!FREE_API_KEY) return null;
 
+  const method = (options.method || "POST").toUpperCase();
+  let url = `${FREE_ASTRO_BASE}${path}`;
+  const headers = {
+    "Content-Type": "application/json",
+    "x-api-key": FREE_API_KEY
+  };
+  const fetchOptions = { method, headers };
+
+  if (method === "GET") {
+    const query = new URLSearchParams(payload);
+    if (query.toString()) {
+      url += `?${query.toString()}`;
+    }
+  } else {
+    fetchOptions.body = JSON.stringify(payload);
+  }
+
   try {
-    const response = await fetch(`${FREE_ASTRO_BASE}${path}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": FREE_API_KEY
-      },
-      body: JSON.stringify(payload)
-    });
+    const response = await fetch(url, fetchOptions);
 
     if (!response.ok) {
       const text = await response.text();
@@ -169,7 +179,7 @@ const fetchFreeAstroEndpoint = async (path, payload) => {
 
     return await response.json();
   } catch (error) {
-    console.warn(`⚠️ FreeAstro endpoint failed (${path}):`, error.message);
+    console.warn(`⚠️ FreeAstro endpoint failed (${method} ${path}):`, error.message);
     return null;
   }
 };
@@ -313,3 +323,6 @@ export const getKundaliFromAPI = async (birthData, advanced = false) => {
     };
   }
 };
+
+// Export helpers used by routes
+export { fetchFreeAstroEndpoint, buildFreeAstroPayload };

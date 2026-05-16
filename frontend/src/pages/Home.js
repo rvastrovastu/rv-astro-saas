@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import BackHomeButton from "../components/BackHomeButton";
 import { getDailyPanchang } from "../api/panchang";
 import logo from "../assets/logo.PNG";
 
@@ -54,6 +55,18 @@ export default function Home() {
       title: "Panchang",
       desc: "Daily Panchang, Tithi, Nakshatra & Muhurat.",
       path: "/panchang"
+    },
+    {
+      icon: "🧾",
+      title: "Birth Chart",
+      desc: "Western birth chart & horoscope (FreeAstro).",
+      path: "/birth-chart"
+    },
+    {
+      icon: "🔮",
+      title: "Daily Horoscope",
+      desc: "Daily horoscope by zodiac sign.",
+      path: "/daily-horoscope"
     },
     {
       icon: "📞",
@@ -366,6 +379,10 @@ export default function Home() {
         <div><h2>99.9%</h2><p>Accuracy</p></div>
         <div><h2>4.9/5</h2><p>User Rating</p></div>
       </section>
+
+      <div style={{ padding: 20, textAlign: "center" }}>
+        <BackHomeButton />
+      </div>
 
       <footer style={styles.footer}>
         <p>© {new Date().getFullYear()} RV Astro Vastu. All Rights Reserved.</p>
