@@ -268,9 +268,8 @@ app.post("/api/panchang/daily", async (c) => {
     }
 
     const endpointsToTry = [
-  	"https://api.freeastroapi.com/api/v2/vedic/panchang",
-    ];
-
+  "https://api.freeastroapi.com/api/v2/vedic/panchang"
+];
     let lastError = null;
 
     for (const endpoint of endpointsToTry) {
