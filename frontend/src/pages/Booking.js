@@ -30,7 +30,7 @@ export default function Booking() {
       >
         <iframe
           title="RV Astro Vastu Consultation Booking"
-          src="https://calendly.com/rvastrovastu/consultation"
+          src="https://calendly.com/rvastrovastu/vastu-consultancy"
           width="100%"
           height="700"
           style={{
