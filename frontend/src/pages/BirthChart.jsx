@@ -1,6 +1,5 @@
 import { useState } from "react";
 import API from "../utils/api";
-import BackHomeButton from "../components/BackHomeButton";
 
 export default function BirthChart() {
   const [form, setForm] = useState({
@@ -57,9 +56,6 @@ export default function BirthChart() {
         </div>
       )}
 
-      <div style={{ marginTop: 30 }}>
-        <BackHomeButton />
-      </div>
     </div>
   );
 }

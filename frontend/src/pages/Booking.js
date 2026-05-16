@@ -1,5 +1,4 @@
 import React from "react";
-import BackHomeButton from "../components/BackHomeButton";
 
 export default function Booking() {
   return (
@@ -11,7 +10,6 @@ export default function Booking() {
         paddingBottom: "40px"
       }}
     >
-      <BackHomeButton />
       <h1
         style={{
           textAlign: "center",

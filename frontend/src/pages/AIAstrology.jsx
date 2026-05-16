@@ -1,5 +1,4 @@
 import { useState } from "react";
-import BackHomeButton from "../components/BackHomeButton";
 
 export default function AIAstrology() {
   const [question, setQuestion] = useState("");
@@ -18,7 +17,6 @@ export default function AIAstrology() {
 
   return (
     <div style={{ padding: 20 }}>
-      <BackHomeButton />
       <h2>🤖 AI Astrology Assistant</h2>
 
       <textarea

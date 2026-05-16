@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import BackHomeButton from "../components/BackHomeButton";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 export default function Chatbot() {
@@ -70,7 +70,6 @@ export default function Chatbot() {
   return (
     <div style={styles.container}>
 
-      <BackHomeButton />
       <h2 style={styles.header}>🤖 AI Astrology Chatbot</h2>
 
       {/* ================= USER DETAILS ================= */}

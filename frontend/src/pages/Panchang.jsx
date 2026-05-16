@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import BackHomeButton from "../components/BackHomeButton";
 import { getDailyPanchang } from "../api/panchang";
 
 export default function Panchang() {
@@ -121,8 +120,6 @@ export default function Panchang() {
   return (
     <div style={styles.container}>
       <h1 style={styles.title}>📅 Panchang & Muhurat</h1>
-
-      <BackHomeButton />
 
       <p style={styles.subtitle}>
         Daily Tithi, Nakshatra, Yoga, Karana, Rahu Kaal, Abhijit Muhurat,

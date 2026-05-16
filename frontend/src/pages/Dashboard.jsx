@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../utils/api";
 import { getUser, logout } from "../utils/auth";
-import BackHomeButton from "../components/BackHomeButton";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -50,7 +49,6 @@ export default function Dashboard() {
   return (
     <div style={styles.container}>
       <h1 style={styles.title}>📊 My Dashboard</h1>
-      <BackHomeButton />
 
       <div style={styles.card}>
         <h2>Welcome, {user?.name || "RV Astro User"}</h2>

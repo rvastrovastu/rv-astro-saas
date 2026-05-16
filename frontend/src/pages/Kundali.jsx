@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import { getKundali } from "../api/astrology";
-import BackHomeButton from "../components/BackHomeButton";
 
 /* ================= ZODIAC WHEEL ================= */
 function ZodiacWheel({ kundali }) {
@@ -454,8 +453,6 @@ export default function Kundali() {
       <p style={styles.subtitle}>
         Generate a free basic Kundali. Login or upgrade to Pro for saving, PDF report, Kundali wheel, Dasha, and AI insights.
       </p>
-
-      <BackHomeButton />
 
       {!isLoggedIn && (
         <div style={styles.guestBanner}>
