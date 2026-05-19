@@ -16,7 +16,20 @@ export default function BackHomeButton({ style }) {
         cursor: "pointer",
         fontWeight: "600",
         marginBottom: 20,
+        fontSize: 14,
+        whiteSpace: "nowrap",
+        transition: "all 0.3s ease",
         ...style
+      }}
+      onMouseEnter={(e) => {
+        e.target.style.background = "#D4AF37";
+        e.target.style.color = "black";
+        e.target.style.borderColor = "#D4AF37";
+      }}
+      onMouseLeave={(e) => {
+        e.target.style.background = "#222";
+        e.target.style.color = "white";
+        e.target.style.borderColor = "#333";
       }}
     >
       ← Back Home

@@ -16,6 +16,8 @@ import DailyHoroscope from "./pages/DailyHoroscope";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
+  const isSmallScreen = typeof window !== "undefined" && window.innerWidth < 768;
+
   return (
     <HashRouter>
       <div style={{ fontFamily: "Arial" }}>
@@ -71,32 +73,51 @@ function App() {
 
         {/* FLOATING WHATSAPP BUTTON */}
         <a
-          href="https://wa.me/1234567890?text=Hi%20I%20need%20astro%20consultation"
+          href="https://wa.me/15137650184?text=Hi%20I%20need%20astro%20consultation"
           target="_blank"
           rel="noreferrer"
           style={{
             position: "fixed",
-            bottom: 20,
-            right: 20,
+            bottom: isSmallScreen ? 80 : 20,
+            right: isSmallScreen ? 12 : 20,
             background: "green",
-            padding: 15,
+            padding: isSmallScreen ? 12 : 15,
             borderRadius: 50,
             color: "white",
-            zIndex: 9999,
+            zIndex: 9998,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontSize: 18,
+            fontSize: isSmallScreen ? 14 : 18,
             textDecoration: "none",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.3)"
+            boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
+            width: isSmallScreen ? 44 : 50,
+            height: isSmallScreen ? 44 : 50
           }}
+          title="Chat with us on WhatsApp"
         >
-          💬 WhatsApp
+          {isSmallScreen ? "💬" : "💬 WhatsApp"}
         </a>
       </div>
       {/* GLOBAL BACK HOME BUTTON (bottom center) */}
-      <div style={{ position: "fixed", left: "50%", transform: "translateX(-50%)", bottom: 18, zIndex: 9999 }}>
-        <BackHomeButton style={{ padding: "10px 18px", borderRadius: 22 }} />
+      <div
+        style={{
+          position: "fixed",
+          left: "50%",
+          transform: "translateX(-50%)",
+          bottom: isSmallScreen ? 12 : 18,
+          zIndex: 9999,
+          display: "flex",
+          justifyContent: "center"
+        }}
+      >
+        <BackHomeButton
+          style={{
+            padding: isSmallScreen ? "8px 12px" : "10px 18px",
+            fontSize: isSmallScreen ? 12 : 14,
+            borderRadius: 22
+          }}
+        />
       </div>
     </HashRouter>
   );

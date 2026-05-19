@@ -187,6 +187,28 @@ router.get("/my", protect, async (req, res) => {
 });
 
 // =====================================================
+// 🔎 GET KUNDALI BY ID (PROTECTED, OWNER ONLY)
+// =====================================================
+router.get("/:id", protect, async (req, res) => {
+  try {
+    const item = await Kundali.findById(req.params.id);
+
+    if (!item) {
+      return res.status(404).json({ error: "Kundali not found" });
+    }
+
+    if (String(item.userId) !== String(req.user.id)) {
+      return res.status(403).json({ error: "Not authorized to view this kundali" });
+    }
+
+    res.json(item);
+  } catch (err) {
+    console.error("❌ Fetch by id error:", err);
+    res.status(500).json({ error: "Fetch failed" });
+  }
+});
+
+// =====================================================
 // 🧿 DASHA ENGINE
 // =====================================================
 function generateDasha(seed) {

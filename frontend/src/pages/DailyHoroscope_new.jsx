@@ -88,13 +88,11 @@ export default function DailyHoroscope() {
     if (!res) return null;
     const body = res.data || res.kundali || res || {};
 
-    // If response is an array, try join texts
     if (Array.isArray(body)) {
       const texts = body.map((b) => extractHoroscopeText(b)).filter(Boolean);
       return texts.length ? texts.join("\n\n") : null;
     }
 
-    // Common keys
     if (typeof body === "string") return body;
     if (body.horoscope && typeof body.horoscope === "string") return body.horoscope;
     if (body.horoscope && typeof body.horoscope === "object") {
@@ -105,7 +103,6 @@ export default function DailyHoroscope() {
     if (body.description) return body.description;
     if (body.summary) return body.summary;
 
-    // Nested shapes used by some providers
     if (body.data) {
       const nested = extractHoroscopeText(body.data);
       if (nested) return nested;
@@ -116,7 +113,6 @@ export default function DailyHoroscope() {
       if (nested) return nested;
     }
 
-    // Try common field names inside objects
     const candidates = ["daily", "today", "today_horoscope", "prediction"];
     for (const k of candidates) {
       if (body[k]) {

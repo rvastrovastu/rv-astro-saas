@@ -729,3 +729,71 @@ const styles = {
     opacity: 0.7
   }
 };
+
+// Mobile responsive adjustments
+if (typeof window !== "undefined" && window.innerWidth < 768) {
+  styles.navbar = {
+    ...styles.navbar,
+    padding: "12px 16px",
+    gap: 8
+  };
+
+  styles.brand = {
+    ...styles.brand,
+    fontSize: 14
+  };
+
+  styles.navLinks = {
+    ...styles.navLinks,
+    display: "none"
+  };
+
+  styles.hero = {
+    ...styles.hero,
+    gridTemplateColumns: "1fr",
+    gap: 20,
+    padding: "40px 16px 20px"
+  };
+
+  styles.heroTitle = {
+    ...styles.heroTitle,
+    fontSize: 32
+  };
+
+  styles.heroDesc = {
+    ...styles.heroDesc,
+    fontSize: 14
+  };
+
+  styles.toolsSection = {
+    ...styles.toolsSection,
+    padding: "16px"
+  };
+
+  styles.toolsGrid = {
+    ...styles.toolsGrid,
+    gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
+    gap: 12
+  };
+
+  styles.muhuratSection = {
+    ...styles.muhuratSection,
+    padding: "16px",
+    margin: "20px auto"
+  };
+
+  styles.muhuratTitle = {
+    ...styles.muhuratTitle,
+    fontSize: 20
+  };
+
+  styles.muhuratForm = {
+    ...styles.muhuratForm,
+    gridTemplateColumns: "1fr"
+  };
+
+  styles.page = {
+    ...styles.page,
+    padding: 0
+  };
+}

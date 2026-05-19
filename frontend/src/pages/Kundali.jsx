@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
-import { getKundali } from "../api/astrology";
+import { getKundali, saveKundali } from "../api/astrology";
+import { getUser } from "../utils/auth";
+import ProFeatures from "../components/ProFeatures";
 
 /* ================= ZODIAC WHEEL ================= */
 function ZodiacWheel({ kundali }) {
@@ -400,6 +402,37 @@ export default function Kundali() {
   const [kundali, setKundali] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  // If URL has ?id= saved_kundali_id, load it (owner only)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
+
+    if (!id) return;
+
+    (async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const headers = token ? { Authorization: `Bearer ${token}` } : {};
+        const res = await axios.get(`/api/kundali/${id}`, { headers });
+        const item = res.data;
+
+        // saved document may store kundali in `data` or full object
+        const data = item.kundali || item.data || item;
+
+        setKundali(data);
+        setForm((f) => ({
+          ...f,
+          name: item.name || data?.native?.name || f.name,
+          dob: item.dob || data?.native?.dob || f.dob,
+          time: item.time || data?.native?.time || f.time,
+          place: item.place || data?.native?.place || f.place
+        }));
+      } catch (err) {
+        console.error("Failed to load saved kundali:", err);
+      }
+    })();
+  }, []);
+
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
 
@@ -437,12 +470,96 @@ export default function Kundali() {
       let res;
 
       res = await getKundali(form, isPro);
-      setKundali(res.data?.kundali || res.data);
+      const generated = res.data?.kundali || res.data;
+      setKundali(generated);
+
+      // Auto-save for Pro users
+      if (isPro) {
+        try {
+          await saveKundali({
+            name: form.name,
+            dob: form.dob,
+            time: form.time,
+            place: form.place,
+            data: generated
+          });
+        } catch (saveErr) {
+          console.error("Failed to save generated kundali:", saveErr);
+        }
+      }
     } catch (err) {
       console.error("Kundali Generate Error:", err);
       alert("Error generating kundali");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handlePdfDownload = () => {
+    if (!kundali) return;
+    
+    try {
+      // Dynamically import jsPDF
+      import("jspdf").then(({ jsPDF }) => {
+        const doc = new jsPDF();
+        doc.setFont("helvetica");
+        
+        // Title
+        doc.setFontSize(18);
+        doc.text("Kundali Report", 20, 20);
+        
+        // Basic Info
+        doc.setFontSize(12);
+        let yPos = 40;
+        doc.text(`Name: ${form.name}`, 20, yPos);
+        yPos += 10;
+        doc.text(`Date: ${form.dob}`, 20, yPos);
+        yPos += 10;
+        doc.text(`Time: ${form.time}`, 20, yPos);
+        yPos += 10;
+        doc.text(`Place: ${form.place}`, 20, yPos);
+        yPos += 15;
+        
+        // Planets
+        doc.setFontSize(14);
+        doc.text("Planets:", 20, yPos);
+        yPos += 8;
+        doc.setFontSize(10);
+        Object.entries(kundali.planets || {}).forEach(([planet, value]) => {
+          const displayValue = typeof value === "object" ? JSON.stringify(value) : String(value);
+          doc.text(`${planet}: ${displayValue}`, 20, yPos);
+          yPos += 6;
+          if (yPos > 270) {
+            doc.addPage();
+            yPos = 20;
+          }
+        });
+        
+        yPos += 5;
+        
+        // Houses
+        doc.setFontSize(14);
+        doc.text("Houses:", 20, yPos);
+        yPos += 8;
+        doc.setFontSize(10);
+        Object.entries(kundali.houses || {}).forEach(([house, value]) => {
+          const displayValue = typeof value === "object" ? JSON.stringify(value) : String(value);
+          doc.text(`${house}: ${displayValue}`, 20, yPos);
+          yPos += 6;
+          if (yPos > 270) {
+            doc.addPage();
+            yPos = 20;
+          }
+        });
+        
+        doc.save(`${form.name}_kundali.pdf`);
+      }).catch(err => {
+        alert("PDF download not available. Please install the library.");
+        console.error(err);
+      });
+    } catch (err) {
+      alert("Error generating PDF");
+      console.error(err);
     }
   };
 
@@ -568,51 +685,7 @@ export default function Kundali() {
 
       {kundali && isPro && <AdvancedKundaliFeatures kundali={kundali} />}
 
-      {kundali && isPro && (
-        <div style={styles.kundaliWrapper}>
-          <div style={styles.leftPanel}>
-            <div style={styles.chart}>
-              {Object.keys(kundali.houses || {}).length ? (
-                Object.keys(kundali.houses || {}).map((h, i) => (
-                  <div key={i} style={styles.cell}>
-                    <b>{h.replace("_", " ")}</b>
-                    <br />
-                    {String(kundali.houses[h])}
-                  </div>
-                ))
-              ) : (
-                <div style={styles.emptyChart}>House chart data will appear here.</div>
-              )}
-            </div>
-
-            <TransformWrapper>
-              <TransformComponent>
-                <ZodiacWheel kundali={kundali} />
-              </TransformComponent>
-            </TransformWrapper>
-
-            <DashaTimeline kundali={kundali} />
-          </div>
-
-          <div style={styles.rightPanel}>
-            <TransitPanel />
-            <HouseAIInsights kundali={kundali} />
-          </div>
-        </div>
-      )}
-
-      {kundali && !isPro && (
-        <div style={styles.lockBox}>
-          <h3>🔒 Unlock Premium Kundali</h3>
-          <p>
-            Get Kundali wheel, Dasha timeline, AI house insights, PDF download, and saved Kundali history.
-          </p>
-
-          <button onClick={() => (window.location.href = "/pricing")} style={styles.upgradeBtn}>
-            Upgrade to Pro 🔥
-          </button>
-        </div>
-      )}
+      {kundali && <ProFeatures kundali={kundali} onPdfDownload={handlePdfDownload} />}
     </div>
   );
 }
@@ -898,14 +971,16 @@ const styles = {
     background: "#111",
     padding: 20,
     borderRadius: 12,
-    border: "1px solid #333"
-  },
+  }
+,
+
   advancedGrid: {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
     gap: 14,
     marginTop: 18
   },
+
   advancedBox: {
     background: "#141414",
     padding: 14,
@@ -913,6 +988,7 @@ const styles = {
     border: "1px solid #333",
     minHeight: 120
   },
+
   advancedCard: {
     background: "#1b1b1b",
     padding: 12,
@@ -923,6 +999,7 @@ const styles = {
     flexDirection: "column",
     gap: 6
   },
+
   proTip: {
     color: "#bbb",
     fontSize: 14
@@ -939,3 +1016,46 @@ const styles = {
     fontWeight: "bold"
   }
 };
+
+// Mobile responsive adjustments
+if (typeof window !== "undefined" && window.innerWidth < 768) {
+  styles.container = {
+    ...styles.container,
+    padding: 12
+  };
+
+  styles.title = {
+    ...styles.title,
+    fontSize: 24
+  };
+
+  styles.form = {
+    ...styles.form,
+    maxWidth: "100%"
+  };
+
+  styles.chart = {
+    ...styles.chart,
+    gridTemplateColumns: "repeat(2, 1fr)"
+  };
+
+  styles.summaryGrid = {
+    ...styles.summaryGrid,
+    gridTemplateColumns: "1fr"
+  };
+
+  styles.planetGrid = {
+    ...styles.planetGrid,
+    gridTemplateColumns: "repeat(2, 1fr)"
+  };
+
+  styles.houseGrid = {
+    ...styles.houseGrid,
+    gridTemplateColumns: "repeat(2, 1fr)"
+  };
+
+  styles.yogaGrid = {
+    ...styles.yogaGrid,
+    gridTemplateColumns: "1fr"
+  };
+}

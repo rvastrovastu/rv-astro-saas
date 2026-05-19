@@ -200,4 +200,36 @@ const styles = {
     cursor: "pointer",
     fontWeight: "bold"
   }
-};  
+};
+
+if (typeof window !== "undefined" && window.innerWidth < 768) {
+  styles.container = {
+    ...styles.container,
+    padding: 14
+  };
+
+  styles.header = {
+    ...styles.header,
+    fontSize: 22
+  };
+
+  styles.chatBox = {
+    ...styles.chatBox,
+    padding: 8
+  };
+
+  styles.inputArea = {
+    ...styles.inputArea,
+    flexDirection: "column"
+  };
+
+  styles.input = {
+    ...styles.input,
+    padding: 12
+  };
+
+  styles.button = {
+    ...styles.button,
+    width: "100%"
+  };
+}  

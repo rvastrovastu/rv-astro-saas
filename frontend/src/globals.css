@@ -1,0 +1,135 @@
+/* Global Mobile Responsive Styles */
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+/* Mobile Menu & Navbar Responsiveness */
+@media (max-width: 768px) {
+  /* Hide long text on mobile */
+  .hide-on-mobile {
+    display: none !important;
+  }
+
+  /* Flexible padding and margins */
+  body {
+    font-size: 14px;
+  }
+
+  /* Button responsiveness */
+  button {
+    padding: 10px 16px !important;
+    font-size: 14px !important;
+    min-height: 44px;
+  }
+
+  /* Input field responsiveness */
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+    min-height: 44px;
+    padding: 12px !important;
+  }
+
+  /* Flex layouts for mobile */
+  .mobile-flex-col {
+    flex-direction: column !important;
+  }
+
+  .mobile-full-width {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* Grid responsiveness */
+  .mobile-grid-1 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .mobile-grid-2 {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  /* Text sizing */
+  h1 {
+    font-size: 28px !important;
+    margin: 16px 0 8px !important;
+  }
+
+  h2 {
+    font-size: 22px !important;
+    margin: 12px 0 6px !important;
+  }
+
+  h3 {
+    font-size: 18px !important;
+  }
+
+  h4 {
+    font-size: 16px !important;
+  }
+
+  /* Padding/margin reduction */
+  .container,
+  .card {
+    padding: 16px !important;
+    margin: 12px !important;
+  }
+
+  /* Navbar flex */
+  nav {
+    flex-wrap: wrap !important;
+    padding: 12px 16px !important;
+    gap: 8px !important;
+  }
+
+  /* Modal/overlay mobile */
+  .modal,
+  .overlay {
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 0 !important;
+  }
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: 24px !important;
+  }
+
+  h2 {
+    font-size: 18px !important;
+  }
+
+  button,
+  input,
+  select {
+    font-size: 14px !important;
+  }
+
+  .hide-on-tiny {
+    display: none !important;
+  }
+}
+
+/* Prevent zoom on input focus (iOS) */
+input,
+select,
+textarea,
+button {
+  font-size: 16px !important;
+}
+
+/* Fix for viewport height on mobile */
+@media (max-height: 600px) {
+  body {
+    min-height: 100vh;
+  }
+}

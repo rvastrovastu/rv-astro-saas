@@ -296,3 +296,22 @@ const styles = {
     lineHeight: 1.5
   }
 };
+
+// Mobile responsive adjustments
+if (typeof window !== "undefined" && window.innerWidth < 768) {
+  styles.container = {
+    ...styles.container,
+    padding: "16px"
+  };
+
+  styles.card = {
+    ...styles.card,
+    maxWidth: "100%",
+    padding: "20px"
+  };
+
+  styles.title = {
+    ...styles.title,
+    fontSize: "24px"
+  };
+}

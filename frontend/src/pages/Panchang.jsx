@@ -456,3 +456,26 @@ const styles = {
     lineHeight: 1.6
   }
 };
+
+// Mobile responsive adjustments
+if (typeof window !== "undefined" && window.innerWidth < 768) {
+  styles.container = {
+    ...styles.container,
+    padding: "16px"
+  };
+
+  styles.title = {
+    ...styles.title,
+    fontSize: "28px"
+  };
+
+  styles.form = {
+    ...styles.form,
+    gridTemplateColumns: "1fr"
+  };
+
+  styles.grid = {
+    ...styles.grid,
+    gridTemplateColumns: "1fr"
+  };
+}

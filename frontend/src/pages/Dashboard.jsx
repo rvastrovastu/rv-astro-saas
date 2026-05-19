@@ -100,7 +100,7 @@ export default function Dashboard() {
               </div>
 
               <button
-                onClick={() => navigate("/kundali")}
+                onClick={() => navigate(`/kundali?id=${k._id || k.id}`)}
                 style={styles.smallBtn}
               >
                 View / Generate
@@ -200,3 +200,26 @@ const styles = {
     cursor: "pointer"
   }
 };
+
+// Mobile responsive adjustments
+if (typeof window !== "undefined" && window.innerWidth < 768) {
+  styles.container = {
+    ...styles.container,
+    padding: "16px"
+  };
+
+  styles.title = {
+    ...styles.title,
+    fontSize: "24px"
+  };
+
+  styles.grid = {
+    ...styles.grid,
+    gridTemplateColumns: "1fr"
+  };
+
+  styles.card = {
+    ...styles.card,
+    padding: "16px"
+  };
+}

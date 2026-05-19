@@ -10,3 +10,7 @@ export const getKundali = (data, advanced = false) => {
 
   return API.post(url, data);
 };
+
+export const saveKundali = (payload) => {
+  return API.post("/kundali/save", payload);
+};

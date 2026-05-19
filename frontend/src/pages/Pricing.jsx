@@ -109,3 +109,34 @@ const styles = {
     cursor: "pointer"
   }
 };
+
+// Mobile responsive adjustments
+if (typeof window !== "undefined" && window.innerWidth < 768) {
+  styles.container = {
+    ...styles.container,
+    padding: 14
+  };
+
+  styles.card = {
+    ...styles.card,
+    margin: "14px auto",
+    padding: 18
+  };
+
+  styles.btn = {
+    ...styles.btn,
+    width: "100%",
+    padding: "14px 18px"
+  };
+
+  styles.secondaryBtn = {
+    ...styles.secondaryBtn,
+    width: "100%",
+    padding: "14px 18px"
+  };
+
+  styles.backBtn = {
+    ...styles.backBtn,
+    width: "100%"
+  };
+}
