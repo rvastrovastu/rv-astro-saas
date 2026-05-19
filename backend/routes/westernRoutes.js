@@ -48,11 +48,18 @@ router.post("/daily-horoscope", async (req, res) => {
     };
 
     const candidates = [
-      { path: "/api/v2/horoscope/daily/sign", method: "GET" }
+      { path: "/api/v2/horoscope/daily/sign", method: "GET" },
+      { path: "/api/v2/horoscope/daily/sign", method: "POST" },
+      { path: "/api/v1/horoscope/daily/sign", method: "GET" },
+      { path: "/api/v1/horoscope/daily/sign", method: "POST" },
+      { path: "/api/v2/horoscope/sign/daily", method: "GET" },
+      { path: "/api/v1/horoscope/sign/daily", method: "GET" }
     ];
 
     for (const endpoint of candidates) {
-      const result = await fetchFreeAstroEndpoint(endpoint.path, payload, { method: endpoint.method });
+      const result = await fetchFreeAstroEndpoint(endpoint.path, payload, {
+        method: endpoint.method
+      });
       if (result) {
         return res.json({ success: true, source: "FREEASTRO_HOROSCOPE", path: endpoint.path, data: result });
       }

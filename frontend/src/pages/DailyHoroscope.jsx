@@ -59,7 +59,7 @@ export default function DailyHoroscope() {
     try {
       setLoading(true);
       const res = await API.post("/western/daily-horoscope", { sign });
-      setResult(res.data);
+      setResult(res.data?.data || res.data);
     } catch (err) {
       console.error(err);
       const errMsg = err?.response?.data?.message || "Failed to fetch horoscope";

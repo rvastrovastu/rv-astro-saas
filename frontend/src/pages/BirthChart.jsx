@@ -28,7 +28,7 @@ export default function BirthChart() {
     try {
       setLoading(true);
       const res = await API.post("/western/birth-chart", form);
-      setResult(res.data);
+      setResult(res.data?.data || res.data);
     } catch (err) {
       console.error(err);
       const errMsg = err?.response?.data?.message || "Failed to generate birth chart";
@@ -42,7 +42,7 @@ export default function BirthChart() {
   const renderChartData = () => {
     if (!result) return null;
     
-    const data = result.data || result;
+    const data = result?.data?.data || result.data || result;
     
     // If it's an SVG, render as HTML
     if (typeof data === "string" && data.includes("<svg")) {
